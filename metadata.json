@@ -1,0 +1,5 @@
+{
+  "name": "Piano Practice Pal",
+  "description": "A daily piano scale practice helper using spaced repetition to help you master all major and minor scales.",
+  "requestFramePermissions": []
+}

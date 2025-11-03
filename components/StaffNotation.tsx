@@ -200,13 +200,11 @@ export default function StaffNotation({ notes, scaleName, activeNoteIndex = -1 }
       // VexFlow expects key signature format like 'G' for 1 sharp, 'D' for 2 sharps, etc.
       const sharpKeys = ['', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
       const keyString = sharpKeys[keySignature.sharps];
-      console.log(`[StaffNotation] ${scaleName} → ${keySignature.sharps} sharps → Key: ${keyString}`);
       stave.addKeySignature(keyString);
     } else if (keySignature.flats) {
       // VexFlow expects key signature format like 'F' for 1 flat, 'Bb' for 2 flats, etc.
       const flatKeys = ['', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
       const keyString = flatKeys[keySignature.flats];
-      console.log(`[StaffNotation] ${scaleName} → ${keySignature.flats} flats → Key: ${keyString}`);
       stave.addKeySignature(keyString);
     }
     

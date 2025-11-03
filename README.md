@@ -5,29 +5,35 @@ A clean, simple web app designed to help you master all piano scales through dai
 ## ✨ Features
 
 - **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
-- **Browse All Scales**: Browse and select any scale from the complete catalog of 95 scales
+- **Browse All Scales**: Browse and select any scale from the complete catalog of 48 scales
 - **Musical Staff Notation**: Professional music notation with treble clef and key signatures for all scales (VexFlow)
-- **Audio Playback**: Hear each scale played with clean piano tones (Web Audio API)
+- **Audio Playback**: Hear each scale played with clean piano tones (Web Audio API) with proper octave handling
 - **Spaced Repetition**: Scales you need more work on appear more frequently
 - **Customizable Scale Types**: Choose which scale types to include in your practice (Major, Natural Minor, Harmonic Minor, Melodic Minor)
 - **Direction Toggle**: For melodic minor scales, switch between ascending and descending forms
 - **Visual Piano Keyboard**: See exactly which notes to play with highlighted keys
-- **Progress Tracking**: Track your confidence level and practice history for all 95 scales
+- **Progress Tracking**: Track your confidence level and practice history for all 48 scales
 - **Export/Import Data**: Backup and restore your practice data across browsers and devices
 - **Enharmonic Support**: Automatically shows enharmonic equivalents (e.g., F# Major / Gb Major)
-- **Proper Music Notation**: Uses correct theoretical notation including double sharps (##) and double flats (bb)
+- **Proper Music Notation**: Uses correct theoretical notation with proper note spelling
 - **Mobile-Friendly**: Fully responsive design works on all devices and screen sizes
 - **Offline-Ready**: All data stored locally in your browser - no account required
+- **Comprehensive Test Suite**: 388 unit tests ensure all scales are musically correct
 
 ## 🎯 Scale Coverage
 
-The app includes all standard piano scales with theoretically correct notation:
-- **15 Major Scales**: C, G, D, A, E, B, F#/Gb, C#/Db, F, Bb, Eb, Ab, Db, Gb, Cb
-- **20 Natural Minor Scales**: A, E, B, F#, C#, G#/Ab, D#/Eb, A#/Bb, D, G, C, F, Bb, Eb, Ab
-- **20 Harmonic Minor Scales**: All keys with raised 7th degree
-- **20 Melodic Minor Scales**: All keys with raised 6th and 7th degrees ascending, natural 6th and 7th descending
+The app includes **48 unique scales** across 4 types, all with theoretically correct notation:
 
-**Note**: Double sharps (##) and double flats (bb) are used where music theory demands, ensuring scales follow proper key signatures and conventions.
+- **12 Major Scales**: C, G, D, A, E, B, F#, C#, F, Bb, Eb, Ab
+- **12 Natural Minor Scales**: A, E, B, F#, C#, D, G, C, F, Bb, Eb, Ab
+- **12 Harmonic Minor Scales**: All keys with raised 7th degree
+- **12 Melodic Minor Scales**: All keys with raised 6th and 7th degrees ascending, natural descending
+
+**Enharmonic Equivalents**: 12 scales have alternative names:
+- Major: B/Cb, F#/Gb, C#/Db
+- Minor (Natural, Harmonic, Melodic): Bb/A#, Eb/D#, Ab/G#
+
+**Total scales including enharmonic names**: 60 scale variations
 
 ## 🚀 Getting Started
 
@@ -73,6 +79,29 @@ To preview the production build locally:
 ```bash
 npm run preview
 ```
+
+### Run Tests
+
+To run the comprehensive test suite (388 tests):
+
+```bash
+# Run tests in watch mode
+npm test
+
+# Run tests once
+npm run test:run
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+The test suite includes:
+- **248 tests** for scale intervals and note spelling
+- **56 tests** for key signature mapping
+- **84 tests** for enharmonic equivalent conversions
 
 ## 📱 How to Use
 
@@ -132,6 +161,7 @@ npm run preview
 - **Vite 6** - Fast build tool and dev server
 - **VexFlow 5** - Professional music notation rendering (SVG)
 - **Web Audio API** - Real-time audio synthesis for scale playback
+- **Vitest 3** - Fast unit testing framework with 388 tests
 - **Tailwind CSS** - Utility-first styling (via CDN)
 - **LocalStorage** - Client-side data persistence
 
@@ -148,13 +178,18 @@ piano-practice-pal/
 │   └── StatsScreen.tsx         # Progress tracking and data export
 ├── constants/           # Static data
 │   ├── piano.ts        # Piano key definitions and frequencies
-│   └── scales.ts       # All 95 scales with proper notation
+│   └── scales.ts       # All 48 scales with proper notation
 ├── hooks/              # Custom React hooks
 │   └── usePracticeData.ts  # Practice data and state management
 ├── services/           # Business logic
 │   ├── audioService.ts     # Web Audio API for scale playback
 │   ├── practiceService.ts  # Scale selection algorithm
 │   └── storageService.ts   # LocalStorage utilities
+├── tests/              # Test suite (388 tests)
+│   ├── setup.ts            # Vitest configuration
+│   ├── scales.test.ts      # Scale interval tests (248 tests)
+│   ├── keySignatures.test.ts  # Key signature tests (56 tests)
+│   └── enharmonic.test.ts  # Enharmonic conversion tests (84 tests)
 ├── types/              # TypeScript type definitions
 │   └── index.ts
 ├── App.tsx             # Main app component and routing
@@ -163,8 +198,7 @@ piano-practice-pal/
 ├── package.json        # Dependencies
 ├── tsconfig.json       # TypeScript config
 ├── vite.config.ts      # Vite config
-├── README.md           # This file
-└── FEATURES.md         # Detailed feature documentation
+└── README.md           # This file
 ```
 
 ## 🎨 Customization

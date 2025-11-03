@@ -1,5 +1,109 @@
 # Changelog
 
+## Version 2.1.0 - Comprehensive Testing & Music Theory Validation (2025-11-03)
+
+### 🎯 Major New Features
+
+#### Comprehensive Test Suite
+- **388 Unit Tests**: Complete test coverage ensuring musical accuracy
+  - 248 tests for scale intervals and note spelling
+  - 56 tests for key signature mapping
+  - 84 tests for enharmonic equivalent conversions
+- **Test Framework**: Vitest 3.2.4 with jsdom environment
+- **Test Infrastructure**: @testing-library/react for component testing
+- **Coverage Reports**: Available via `npm run test:coverage`
+- **CI/CD Ready**: Tests complete in ~950ms
+
+#### Test Coverage Areas
+- **Scale Intervals**: Validates all 48 scales follow correct patterns
+  - Major: W-W-H-W-W-W-H (whole-whole-half-whole-whole-whole-half)
+  - Natural Minor: W-H-W-W-H-W-W
+  - Harmonic Minor: W-H-W-W-H-Aug2-H (augmented 2nd)
+  - Melodic Minor: W-H-W-W-W-W-H ascending, natural minor descending
+- **Note Spelling**: Each letter name (A-G) appears exactly once per scale
+- **Key Signatures**: All scales map correctly to 0-7 sharps or flats
+- **Enharmonic Conversions**: Scale-degree preservation validated
+- **Database Integrity**: Validates count, uniqueness, required properties
+
+### 🔧 Critical Fixes
+
+#### Audio Playback - Octave Handling
+- **Fixed**: Scales now properly cross octave boundaries
+- **Problem**: All notes were in same octave (C4-B4), causing downward jumps
+  - Example: B Major played B4 → C#4 (wrong) instead of B4 → C#5 (correct)
+- **Solution**: Intelligent octave tracking algorithm
+  - Detects when note letter wraps (B→C, G→A, etc.)
+  - Automatically increments octave for ascending progression
+  - All scales now sound melodically natural and correct
+
+#### Staff Notation Display
+- **Increased width**: 700px → 800px for better accidental spacing
+- **Better rendering**: Accommodates scales with 6-7 accidentals
+- **Visual improvement**: Proper spacing for complex key signatures
+
+### 🎵 Scale Database Corrections
+
+#### Accurate Scale Count
+- **Total unique scales**: 48 (corrected from previous documentation of 95)
+  - 12 Major scales
+  - 12 Natural Minor scales
+  - 12 Harmonic Minor scales
+  - 12 Melodic Minor scales
+- **Enharmonic alternatives**: 12 scales with alternative names
+  - 3 Major: B/Cb, F#/Gb, C#/Db
+  - 9 Minor: Bb/A#, Eb/D#, Ab/G# (Natural, Harmonic, Melodic)
+- **Total variations**: 60 scale options for users
+
+### 📦 New Dependencies
+- `vitest: ^3.2.4` - Fast unit testing framework
+- `@testing-library/react: ^16.3.0` - Component testing utilities
+- `@testing-library/jest-dom: ^6.9.1` - DOM matchers
+- `jsdom: ^27.0.1` - Browser environment simulation
+- `@vitest/ui: ^3.2.4` - Interactive test UI
+
+### 📝 Documentation Updates
+- **README.md**: 
+  - Corrected scale counts (48 unique scales)
+  - Added test suite documentation
+  - Updated feature list with test coverage
+  - Added test commands and usage
+- **New Test Files**:
+  - `tests/setup.ts` - Test configuration
+  - `tests/scales.test.ts` - Scale validation (248 tests)
+  - `tests/keySignatures.test.ts` - Key signature tests (56 tests)
+  - `tests/enharmonic.test.ts` - Enharmonic tests (84 tests)
+
+### 🧹 Code Quality
+- **Removed debug logs**: Cleaned up console.log statements from production code
+- **Kept useful warnings**: Maintained console.warn for error detection
+- **Better comments**: Improved code documentation
+- **Type safety**: All scales verified against TypeScript definitions
+
+### 🚀 New npm Scripts
+```bash
+npm test              # Run tests in watch mode
+npm run test:run      # Run tests once
+npm run test:ui       # Interactive test UI
+npm run test:coverage # Coverage report
+```
+
+### ✅ Verification
+- ✅ Music theory validated against authoritative sources
+- ✅ 388 passing unit tests
+- ✅ Manual testing of all 48 scales
+- ✅ Audio playback verification
+- ✅ Staff notation rendering checked
+- ✅ Production build successful
+- ✅ TypeScript strict mode compliance
+
+### 🎓 Developer Experience
+- **Regression protection**: Tests catch changes to scale definitions
+- **Documentation**: Tests serve as executable music theory specification
+- **Easy contribution**: Clear patterns for adding new scales
+- **Fast feedback**: Tests run in under 1 second
+
+---
+
 ## Version 2.0.0 - Musical Notation & Audio Playback (2025-11-03)
 
 ### 🎼 Major New Features

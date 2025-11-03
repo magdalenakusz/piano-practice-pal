@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/piano-practice-pal/sw.js', { scope: '/piano-practice-pal/' })})}

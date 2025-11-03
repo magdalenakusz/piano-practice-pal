@@ -320,7 +320,7 @@ These APIs are provided by web browsers and are not subject to additional licens
 
 We are deeply grateful to the open-source community and all contributors to the projects listed above. Their work makes applications like Piano Practice Pal possible.
 
-If you believe any attribution is missing or incorrect, please contact: pianopracticepal@gmail.com
+If you believe any attribution is missing or incorrect, please contact: ToDo
 
 ---
 

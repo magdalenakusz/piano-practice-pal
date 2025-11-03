@@ -159,7 +159,7 @@ These Terms, together with the Privacy Policy and Licenses, constitute the entir
 
 For questions, support, or legal inquiries:
 
-- **Email**: pianopracticepal@gmail.com
+- **Email**: ToDo
 - **Website**: https://magdalenakusz.github.io/piano-practice-pal/
 - **GitHub**: https://github.com/magdalenakusz/piano-practice-pal
 

@@ -68,7 +68,7 @@ You have the right to:
 ## Contact
 
 If you have questions about this privacy policy, please contact:
-- Email: pianopracticepal@gmail.com
+- Email: ToDo
 - Website: https://magdalenakusz.github.io/piano-practice-pal/
 
 ## Summary

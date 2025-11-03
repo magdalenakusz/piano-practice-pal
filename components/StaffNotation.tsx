@@ -1,6 +1,22 @@
 import React, { useEffect, useRef } from 'react';
 import { Renderer, Stave, StaveNote, Voice, Formatter, Accidental } from 'vexflow';
 
+/**
+ * StaffNotation Component
+ * 
+ * Renders musical notation on a standard 5-line staff using VexFlow.
+ * Displays scales with proper treble clef, key signatures, and note positioning.
+ * 
+ * Features:
+ * - Automatic key signature detection for all 95 scales
+ * - Proper octave spanning matching audio playback
+ * - Accidental rendering (sharps, flats, double sharps, double flats)
+ * - SVG rendering for crisp display on all screen sizes
+ * 
+ * @param notes - Array of note names (e.g., ["C", "D", "E", "F#", "G", "A", "B"])
+ * @param scaleName - Full scale name (e.g., "G Major", "E Harmonic Minor")
+ */
+
 interface StaffNotationProps {
   notes: string[];
   scaleName: string;

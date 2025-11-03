@@ -5,9 +5,9 @@ A clean, simple web app designed to help you master all piano scales through dai
 ## ✨ Features
 
 - **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
-- **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
 - **Browse All Scales**: Browse and select any scale from the complete catalog of 95 scales
-- **Audio Playback**: Hear each scale played with realistic piano tones (Web Audio API)
+- **Musical Staff Notation**: Professional music notation with treble clef and key signatures for all scales (VexFlow)
+- **Audio Playback**: Hear each scale played with clean piano tones (Web Audio API)
 - **Spaced Repetition**: Scales you need more work on appear more frequently
 - **Customizable Scale Types**: Choose which scale types to include in your practice (Major, Natural Minor, Harmonic Minor, Melodic Minor)
 - **Direction Toggle**: For melodic minor scales, switch between ascending and descending forms
@@ -78,7 +78,8 @@ npm run preview
 
 1. **Practice Mode** (default view):
    - See your daily selected scales
-   - View the notes on a visual piano keyboard
+   - **📝 Musical Notation**: View scales on a professional music staff with treble clef and key signatures
+   - **🎹 Piano Keyboard**: See notes highlighted on a visual piano keyboard
    - **🔊 Listen**: Click "Play Scale" to hear it, or "Up & Down" to hear it ascending and descending
    - For melodic minor scales, toggle between ascending ↑ and descending ↓ forms
    - Click "I've Practiced This Scale" when done
@@ -88,7 +89,8 @@ npm run preview
    - Click "Browse All Scales" in the header
    - Search for scales by name (e.g., "C", "Minor", "Harmonic")
    - Filter by scale type (Major, Natural Minor, Harmonic Minor, Melodic Minor)
-   - Preview any scale with the piano keyboard visualization
+   - **📝 Musical Notation**: See each scale on a professional staff with proper key signatures
+   - **🎹 Piano Preview**: Preview any scale with the keyboard visualization
    - **🔊 Listen**: Use the "Play" and "Up & Down" buttons to hear each scale
    - Click "Practice This Scale" to practice it immediately
    - Perfect for working on specific scales or exploring the full catalog
@@ -126,8 +128,10 @@ npm run preview
 ## 🛠️ Technology Stack
 
 - **React 19** - Modern UI library with hooks
-- **TypeScript** - Type-safe development
-- **Vite** - Fast build tool and dev server
+- **TypeScript 5.8** - Type-safe development
+- **Vite 6** - Fast build tool and dev server
+- **VexFlow 5** - Professional music notation rendering (SVG)
+- **Web Audio API** - Real-time audio synthesis for scale playback
 - **Tailwind CSS** - Utility-first styling (via CDN)
 - **LocalStorage** - Client-side data persistence
 
@@ -136,26 +140,31 @@ npm run preview
 ```
 piano-practice-pal/
 ├── components/          # React components
-│   ├── PianoKeyboard.tsx
-│   ├── PracticeScreen.tsx
-│   └── StatsScreen.tsx
+│   ├── BrowseScalesScreen.tsx  # Scale catalog browser
+│   ├── PianoKeyboard.tsx       # Visual piano with highlighted keys
+│   ├── PracticeScreen.tsx      # Main practice interface
+│   ├── SettingsScreen.tsx      # Scale type customization
+│   ├── StaffNotation.tsx       # Musical staff notation (VexFlow)
+│   └── StatsScreen.tsx         # Progress tracking and data export
 ├── constants/           # Static data
-│   ├── piano.ts        # Piano key definitions
-│   └── scales.ts       # All 35 scales
+│   ├── piano.ts        # Piano key definitions and frequencies
+│   └── scales.ts       # All 95 scales with proper notation
 ├── hooks/              # Custom React hooks
-│   └── usePracticeData.ts
+│   └── usePracticeData.ts  # Practice data and state management
 ├── services/           # Business logic
+│   ├── audioService.ts     # Web Audio API for scale playback
 │   ├── practiceService.ts  # Scale selection algorithm
 │   └── storageService.ts   # LocalStorage utilities
 ├── types/              # TypeScript type definitions
 │   └── index.ts
-├── App.tsx             # Main app component
+├── App.tsx             # Main app component and routing
 ├── index.tsx           # Entry point
 ├── index.html          # HTML template
 ├── package.json        # Dependencies
 ├── tsconfig.json       # TypeScript config
 ├── vite.config.ts      # Vite config
-└── README.md           # This file
+├── README.md           # This file
+└── FEATURES.md         # Detailed feature documentation
 ```
 
 ## 🎨 Customization

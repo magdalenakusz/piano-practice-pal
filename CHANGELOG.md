@@ -1,5 +1,66 @@
 # Changelog
 
+## Version 2.0.0 - Musical Notation & Audio Playback (2025-11-03)
+
+### 🎼 Major New Features
+
+#### Professional Music Notation
+- **VexFlow Integration**: Added professional music notation library (VexFlow 5.0)
+- **Musical Staff Display**: Shows scales on standard 5-line staff with treble clef
+- **Key Signatures**: Automatically displays correct sharps/flats for all 95 scales
+  - Sharp keys: 1-7 sharps (G Major through C# Major)
+  - Flat keys: 1-7 flats (F Major through Cb Major)
+  - Proper relative minor key signatures
+- **Note Rendering**: Accurate note positioning on staff lines and spaces
+- **Accidentals**: Displays sharp, flat, double sharp, and double flat symbols
+- **Octave Accuracy**: Notes span correct octave range matching audio playback
+- **SVG Graphics**: Crisp, scalable rendering on all screen sizes
+- **Integration**: Appears in both Practice and Browse screens
+- **New Component**: `StaffNotation.tsx` with comprehensive key signature mapping
+
+#### Audio Playback System
+- **Web Audio API**: Real-time audio synthesis for scale playback
+- **Triangle Wave**: Clean, educational piano tone
+- **ADSR Envelope**: Natural attack, decay, sustain, release
+- **Octave Balancing**: Intelligent octave selection for comfortable listening
+  - C, D, E scales start in octave 4 (middle C region)
+  - F, F#, G, A, B scales start in octave 3 (slightly lower)
+  - Automatic octave progression at note C
+- **Legato Timing**: Smooth 0.05s note overlap for musical phrasing
+- **Play Modes**:
+  - "Play Scale": Ascending only
+  - "Up & Down": Ascending then descending
+- **New Service**: `audioService.ts` with frequency calculation and playback logic
+- **Performance**: Lightweight, no external audio files, instant response
+
+### 🎹 Enhanced User Experience
+- **Multi-Modal Learning**: Visual (staff + keyboard), Auditory (playback), Kinesthetic (practice)
+- **Educational Value**: See how scales appear in actual sheet music
+- **Music Theory**: Understand relationship between scales and key signatures
+- **Sight Reading**: Practice reading scales in standard notation
+
+### 📦 Technical Details
+- **New Dependency**: `vexflow ^5.0.0` (professional music notation)
+- **Bundle Size**: 1,364 KB (766 KB gzipped) - includes VexFlow library
+- **Architecture**: Clean separation between notation rendering and audio synthesis
+- **Error Handling**: Graceful fallback for notation rendering failures
+- **Type Safety**: Full TypeScript coverage for new features
+
+### 🔧 Code Quality Improvements
+- **Clean Code**: Removed all debug logging from production build
+- **Documentation**: Updated README.md with musical notation features
+- **Feature Docs**: Expanded FEATURES.md with notation and audio sections
+- **No Errors**: Zero TypeScript compilation errors
+- **Consistent Style**: Maintained 2-space indentation throughout
+
+### 📝 Documentation Updates
+- **README.md**: Added musical notation to feature list and usage instructions
+- **FEATURES.md**: New sections on Musical Staff Notation and Audio Playback System
+- **Technology Stack**: Updated to include VexFlow and Web Audio API
+- **Project Structure**: Updated file tree to include new components and services
+
+---
+
 ## Version 1.1.0 - Scale Customization & Music Theory Enhancements (2025-11-03)
 
 ### 🎯 New Features

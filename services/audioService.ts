@@ -1,4 +1,21 @@
-// Audio service for playing piano notes using Web Audio API
+/**
+ * Audio Service
+ * 
+ * Provides audio playback for piano scales using the Web Audio API.
+ * Generates clean triangle wave tones with ADSR envelope for educational purposes.
+ * 
+ * Features:
+ * - Real-time audio synthesis (no external audio files)
+ * - Intelligent octave balancing for comfortable listening range
+ * - Legato timing with slight note overlap for musical phrasing
+ * - Support for all note names including double sharps and double flats
+ * 
+ * Audio Parameters:
+ * - Waveform: Triangle wave (clean, simple tone)
+ * - Tempo: 0.5s per note (medium pace)
+ * - Overlap: 0.05s between notes (smooth legato)
+ * - ADSR: 0.02s attack, 0.1s decay, 0.3 sustain, 0.1s release
+ */
 
 // Base frequencies for octave 4 (middle C = C4)
 const BASE_NOTE_FREQUENCIES: { [key: string]: number } = {

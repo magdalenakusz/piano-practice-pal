@@ -1,5 +1,87 @@
 # Piano Practice Pal - Feature Documentation
 
+## Musical Staff Notation
+
+### Overview
+Professional music notation using the VexFlow library to display scales on a standard 5-line music staff with treble clef and proper key signatures.
+
+### Features
+- **Treble Clef (G Clef)**: Standard notation for piano
+- **Key Signatures**: Automatically displays the correct sharps or flats for each scale
+- **Note Positioning**: Notes positioned correctly on lines and spaces
+- **Accidentals**: Sharp (♯), flat (♭), double sharp (𝄪), and double flat (𝄫) symbols
+- **Octave Accuracy**: Notes span the correct octave range matching audio playback
+- **SVG Rendering**: Crisp, scalable graphics that work on all screen sizes
+
+### Key Signature Detection
+The system automatically detects and displays the correct key signature for all 95 scales:
+
+**Sharp Keys:**
+- 1 sharp: G Major, E Minor
+- 2 sharps: D Major, B Minor
+- 3 sharps: A Major, F# Minor
+- 4 sharps: E Major, C# Minor
+- 5 sharps: B Major, G# Minor
+- 6 sharps: F# Major, D# Minor
+- 7 sharps: C# Major, A# Minor
+
+**Flat Keys:**
+- 1 flat: F Major, D Minor
+- 2 flats: Bb Major, G Minor
+- 3 flats: Eb Major, C Minor
+- 4 flats: Ab Major, F Minor
+- 5 flats: Db Major, Bb Minor
+- 6 flats: Gb Major, Eb Minor
+- 7 flats: Cb Major, Ab Minor
+
+### Technical Implementation
+- **Library**: VexFlow 5.0 (professional music notation)
+- **Format**: SVG (Scalable Vector Graphics)
+- **Integration**: Appears in both Practice and Browse screens
+- **Error Handling**: Graceful fallback if rendering fails
+- **Performance**: Lightweight, renders instantly on modern browsers
+
+### Educational Value
+- **Visual Learning**: See exactly how scales appear in sheet music
+- **Music Theory**: Understand key signatures and their relationship to scales
+- **Reading Practice**: Improve sight-reading skills
+- **Multi-Modal**: Combines visual (staff + keyboard), auditory (playback), and kinesthetic (practice) learning
+
+## Audio Playback System
+
+### Overview
+Real-time audio synthesis using the Web Audio API to play scales with clean, educational piano tones.
+
+### Features
+- **Triangle Wave**: Clean, simple tone ideal for learning
+- **ADSR Envelope**: Attack, Decay, Sustain, Release for natural sound
+- **Octave Balancing**: Scales play in comfortable hearing range
+- **Legato Timing**: Smooth note transitions (0.05s overlap)
+- **Play Modes**:
+  - **Play Scale**: Ascending only
+  - **Up & Down**: Ascending then descending
+
+### Audio Parameters
+- **Waveform**: Triangle wave (Web Audio API OscillatorNode)
+- **Tempo**: Medium (0.5s per note)
+- **Attack**: 0.02s (quick onset)
+- **Decay**: 0.1s (smooth transition to sustain)
+- **Sustain**: 0.3 level (70% volume)
+- **Release**: 0.1s (gentle fadeout)
+- **Overlap**: 0.05s between notes (legato feel)
+
+### Octave Logic
+Scales start in different octaves based on their root note to ensure balanced hearing range:
+- **C, D, E**: Start in octave 4 (middle C region)
+- **F, F#, G, A, B**: Start in octave 3 (slightly lower)
+- **Octave Progression**: Automatically increments when crossing C (e.g., B4 → C5)
+
+### Technical Details
+- **API**: Web Audio API (native browser support)
+- **No External Files**: Audio generated in real-time, no MP3/WAV files needed
+- **Efficient**: Lightweight, no loading delays
+- **Cross-Browser**: Works in all modern browsers (Chrome, Firefox, Safari, Edge)
+
 ## Scale Customization System
 
 ### Overview

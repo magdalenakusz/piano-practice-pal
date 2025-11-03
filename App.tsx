@@ -4,12 +4,13 @@ import { PracticeScreen } from './components/PracticeScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsScreen } from './components/SettingsScreen';
 import { BrowseScalesScreen } from './components/BrowseScalesScreen';
+import { AboutScreen } from './components/AboutScreen';
 import { InstallPrompt } from './components/InstallPrompt';
 import { initializeAudio } from './services/audioService';
 import type { Scale } from './types';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'practice' | 'stats' | 'settings' | 'browse'>('practice');
+  const [view, setView] = useState<'practice' | 'stats' | 'settings' | 'browse' | 'about'>('practice');
   const [selectedScale, setSelectedScale] = useState<Scale | null>(null);
   const practiceManager = usePracticeData();
 
@@ -70,6 +71,8 @@ const App: React.FC = () => {
               ? 'Review your progress and find areas to improve.'
               : view === 'browse'
               ? 'Choose any scale from the catalog to practice.'
+              : view === 'about'
+              ? 'Information about the app, privacy, and licenses.'
               : 'Customize your practice experience.'
             }
           </p>
@@ -95,6 +98,13 @@ const App: React.FC = () => {
               >
                 Settings
               </button>
+              <span className="text-gray-600">|</span>
+              <button
+                onClick={() => setView('about')}
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                About
+              </button>
             </div>
           )}
         </header>
@@ -119,6 +129,10 @@ const App: React.FC = () => {
             <BrowseScalesScreen
               onClose={() => setView('practice')}
               onSelectScale={handleSelectScaleFromBrowse}
+            />
+          ) : view === 'about' ? (
+            <AboutScreen
+              onClose={() => setView('practice')}
             />
           ) : (
             <PracticeScreen 

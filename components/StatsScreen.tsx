@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { ALL_SCALES } from '../constants/scales';
+import { downloadDataAsFile, uploadDataFromFile } from '../services/storageService';
 import type { PracticeData, ConfidenceLevel } from '../types';
 
 type SortKey = 'name' | 'lastPracticed' | 'confidence';
@@ -57,6 +58,42 @@ const SortButton: React.FC<SortButtonProps> = ({ currentSortKey, targetSortKey, 
 
 export const StatsScreen: React.FC<StatsScreenProps> = ({ practiceData, onClose, onReset }) => {
   const [sortKey, setSortKey] = useState<SortKey>('lastPracticed');
+  const [importStatus, setImportStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleExport = () => {
+    downloadDataAsFile();
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const success = await uploadDataFromFile(file);
+      if (success) {
+        setImportStatus('success');
+        setTimeout(() => {
+          window.location.reload(); // Reload to reflect imported data
+        }, 1500);
+      } else {
+        setImportStatus('error');
+        setTimeout(() => setImportStatus('idle'), 3000);
+      }
+    } catch (error) {
+      setImportStatus('error');
+      setTimeout(() => setImportStatus('idle'), 3000);
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const sortedScales = useMemo(() => {
     return [...ALL_SCALES].sort((a, b) => {
@@ -87,14 +124,56 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ practiceData, onClose,
     <>
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-3xl font-bold text-white">Practice History</h2>
-        <button
-          onClick={onReset}
-          title="Reset all practice data"
-          className="px-3 py-1 text-sm rounded-full transition-colors bg-red-800 hover:bg-red-700 text-white transform hover:scale-105"
-        >
-          Reset All
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExport}
+            title="Export practice data"
+            className="px-3 py-1 text-sm rounded-full transition-colors bg-green-700 hover:bg-green-600 text-white transform hover:scale-105 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Export
+          </button>
+          <button
+            onClick={handleImportClick}
+            title="Import practice data"
+            className="px-3 py-1 text-sm rounded-full transition-colors bg-blue-700 hover:bg-blue-600 text-white transform hover:scale-105 flex items-center gap-1"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Import
+          </button>
+          <button
+            onClick={onReset}
+            title="Reset all practice data"
+            className="px-3 py-1 text-sm rounded-full transition-colors bg-red-800 hover:bg-red-700 text-white transform hover:scale-105"
+          >
+            Reset
+          </button>
+        </div>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".json"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
+      {importStatus === 'success' && (
+        <div className="mb-4 p-3 bg-green-600/20 border border-green-500/30 rounded-lg text-center">
+          <p className="text-green-300 text-sm">✅ Data imported successfully! Reloading...</p>
+        </div>
+      )}
+
+      {importStatus === 'error' && (
+        <div className="mb-4 p-3 bg-red-600/20 border border-red-500/30 rounded-lg text-center">
+          <p className="text-red-300 text-sm">❌ Failed to import data. Please check the file format.</p>
+        </div>
+      )}
       
       <div className="flex justify-center space-x-2 mb-4">
         <SortButton currentSortKey={sortKey} targetSortKey="name" setSortKey={setSortKey}>

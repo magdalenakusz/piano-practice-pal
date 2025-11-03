@@ -2,8 +2,6 @@
 
 A clean, simple web app designed to help you master all piano scales through daily practice and spaced repetition. Perfect for pianists of all levels who want to build consistent practice habits.
 
-![Piano Practice Pal](https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6)
-
 ## ✨ Features
 
 - **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
@@ -13,6 +11,7 @@ A clean, simple web app designed to help you master all piano scales through dai
 - **Direction Toggle**: For melodic minor scales, switch between ascending and descending forms
 - **Visual Piano Keyboard**: See exactly which notes to play with highlighted keys
 - **Progress Tracking**: Track your confidence level and practice history for all 95 scales
+- **Export/Import Data**: Backup and restore your practice data across browsers and devices
 - **Enharmonic Support**: Automatically shows enharmonic equivalents (e.g., F# Major / Gb Major)
 - **Proper Music Notation**: Uses correct theoretical notation including double sharps (##) and double flats (bb)
 - **Mobile-Friendly**: Fully responsive design works on all devices and screen sizes
@@ -104,9 +103,19 @@ npm run preview
    - Click "View Practice History" to see all scales
    - Sort by name, recent practice, or confidence level
    - Track your progress over time
-   - Reset all data if you want to start fresh
+   - **Export**: Download your practice data as a JSON file for backup
+   - **Import**: Upload a previously exported file to restore your progress
+   - **Reset**: Clear all data if you want to start fresh
 
-5. **New Session**:
+5. **Backup & Restore**:
+   - **Export your data**: Click "Export" in the Stats view to download a backup file
+   - **Import your data**: Click "Import" and select a backup file to restore
+   - Useful for:
+     - Backing up your progress
+     - Transferring data between browsers or devices
+     - Recovering after accidentally clearing browser data
+
+6. **New Session**:
    - Complete all daily scales to unlock a new session
    - Start practicing more scales whenever you want
 

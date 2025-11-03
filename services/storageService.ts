@@ -120,3 +120,107 @@ export function updateScaleTypeSettings(scaleTypeSettings: ScaleTypeSettings): U
   saveUserSettings(settings);
   return settings;
 }
+
+// Export/Import
+
+export interface ExportData {
+  version: string;
+  exportDate: string;
+  practiceData: PracticeData;
+  userSettings: UserSettings;
+  dailyPractice?: {
+    date: string;
+    scales: string[];
+  } | null;
+}
+
+export function exportAllData(): ExportData {
+  const todayStr = getTodayDateString();
+  let dailyPractice = null;
+  
+  try {
+    const dailyPracticeRaw = localStorage.getItem(DAILY_PRACTICE_KEY);
+    if (dailyPracticeRaw) {
+      dailyPractice = JSON.parse(dailyPracticeRaw);
+    }
+  } catch (error) {
+    console.error('Failed to read daily practice for export', error);
+  }
+
+  return {
+    version: '1.0',
+    exportDate: new Date().toISOString(),
+    practiceData: getPracticeData(),
+    userSettings: getUserSettings(),
+    dailyPractice,
+  };
+}
+
+export function importAllData(data: ExportData): boolean {
+  try {
+    // Validate data structure
+    if (!data || typeof data !== 'object') {
+      throw new Error('Invalid import data format');
+    }
+
+    // Import practice data
+    if (data.practiceData && typeof data.practiceData === 'object') {
+      savePracticeData(data.practiceData);
+    }
+
+    // Import user settings
+    if (data.userSettings && typeof data.userSettings === 'object') {
+      saveUserSettings(data.userSettings);
+    }
+
+    // Import daily practice if it's for today
+    const todayStr = getTodayDateString();
+    if (data.dailyPractice && data.dailyPractice.date === todayStr && Array.isArray(data.dailyPractice.scales)) {
+      localStorage.setItem(DAILY_PRACTICE_KEY, JSON.stringify(data.dailyPractice));
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to import data', error);
+    return false;
+  }
+}
+
+export function downloadDataAsFile(): void {
+  const data = exportAllData();
+  const jsonString = JSON.stringify(data, null, 2);
+  const blob = new Blob([jsonString], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `piano-practice-backup-${new Date().toISOString().split('T')[0]}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+export function uploadDataFromFile(file: File): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    
+    reader.onload = (event) => {
+      try {
+        const jsonString = event.target?.result as string;
+        const data = JSON.parse(jsonString);
+        const success = importAllData(data);
+        resolve(success);
+      } catch (error) {
+        console.error('Failed to parse import file', error);
+        reject(error);
+      }
+    };
+    
+    reader.onerror = () => {
+      reject(new Error('Failed to read file'));
+    };
+    
+    reader.readAsText(file);
+  });
+}

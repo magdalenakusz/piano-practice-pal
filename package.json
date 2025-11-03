@@ -1,9 +1,9 @@
 {
   "name": "piano-practice-pal",
   "private": true,
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
-  "description": "A daily piano scale practice helper with musical notation, audio playback, and spaced repetition to master all major and minor scales",
+  "description": "A daily piano scale practice helper with musical notation, audio playback, comprehensive testing, and spaced repetition to master all 48 scales",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

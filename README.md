@@ -226,12 +226,26 @@ const recencyWeight = daysSincePracticed;
 const randomFactor = Math.random() * 5;
 ```
 
+## 🗺️ Roadmap
+
+Want to see what's coming next? Check out our [**ROADMAP.md**](ROADMAP.md) for:
+- 🎯 Planned features (metronome, arpeggios, MIDI input, and more!)
+- 🚀 Version timeline
+- 💡 Feature ideas and community suggestions
+- 📊 Priority matrix for upcoming improvements
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:
-- Report bugs
-- Suggest new features
+- Report bugs (open an issue)
+- Suggest new features (see [ROADMAP.md](ROADMAP.md) for ideas)
 - Submit pull requests
+- Improve documentation
+
+### Quick Links
+- [CHANGELOG.md](CHANGELOG.md) - Version history
+- [ROADMAP.md](ROADMAP.md) - Future plans
+- [QUICK-REFERENCE.md](QUICK-REFERENCE.md) - Developer guide
 
 ## 📄 License
 

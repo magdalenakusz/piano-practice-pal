@@ -170,7 +170,8 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn & { overrideScale?: 
     setShowDescending(false); // Reset for next scale
   };
 
-  if (isSessionComplete) {
+  // Show completion screen only if session is complete AND no override scale is selected
+  if (isSessionComplete && !overrideScale) {
     return <CompletionScreen onStartNewSession={startNewSession} />;
   }
 

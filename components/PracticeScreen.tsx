@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { PianoKeyboard } from './PianoKeyboard';
+import StaffNotation from './StaffNotation';
 import { ALL_SCALES, ENHARMONIC_EQUIVALENTS } from '../constants/scales';
 import { playScale, playScaleUpAndDown } from '../services/audioService';
 import type { Scale, ConfidenceLevel } from '../types';
@@ -173,6 +174,9 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
             Up & Down
           </button>
         </div>
+
+        {/* Musical Staff Notation */}
+        <StaffNotation notes={displayNotes} scaleName={scale.name} />
 
         <PianoKeyboard scaleNotes={displayNotes} />
         

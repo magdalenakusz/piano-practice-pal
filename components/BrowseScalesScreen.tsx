@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ALL_SCALES } from '../constants/scales';
 import { PianoKeyboard } from './PianoKeyboard';
+import StaffNotation from './StaffNotation';
 import { playScale, playScaleUpAndDown } from '../services/audioService';
 import type { Scale, ScaleType } from '../types';
 
@@ -141,6 +142,12 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Musical Staff Notation */}
+              <div>
+                <div className="text-sm text-gray-400 mb-2">Musical Notation:</div>
+                <StaffNotation notes={selectedScale.notes} scaleName={selectedScale.name} />
               </div>
 
               <div>

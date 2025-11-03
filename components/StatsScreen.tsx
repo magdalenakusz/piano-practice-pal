@@ -122,9 +122,9 @@ export const StatsScreen: React.FC<StatsScreenProps> = ({ practiceData, onClose,
 
   return (
     <>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-3xl font-bold text-white">Practice History</h2>
-        <div className="flex gap-2">
+      <div className="mb-4">
+        <h2 className="text-3xl font-bold text-white mb-3">Practice History</h2>
+        <div className="flex gap-2 justify-center flex-wrap">
           <button
             onClick={handleExport}
             title="Export practice data"

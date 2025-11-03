@@ -21,23 +21,23 @@ export const ALL_SCALES: Scale[] = [
   { name: 'Cb Major', notes: ['Cb', 'Db', 'Eb', 'Fb', 'Gb', 'Ab', 'Bb'], type: 'major' },
   
   // Natural Minor Scales (Sharp Keys)
-  { name: 'A Minor', notes: ['A', 'B', 'C', 'D', 'E', 'F', 'G'], type: 'natural-minor' },
-  { name: 'E Minor', notes: ['E', 'F#', 'G', 'A', 'B', 'C', 'D'], type: 'natural-minor' },
-  { name: 'B Minor', notes: ['B', 'C#', 'D', 'E', 'F#', 'G', 'A'], type: 'natural-minor' },
-  { name: 'F# Minor', notes: ['F#', 'G#', 'A', 'B', 'C#', 'D', 'E'], type: 'natural-minor' },
-  { name: 'C# Minor', notes: ['C#', 'D#', 'E', 'F#', 'G#', 'A', 'B'], type: 'natural-minor' },
-  { name: 'G# Minor', notes: ['G#', 'A#', 'B', 'C#', 'D#', 'E', 'F#'], type: 'natural-minor' },
-  { name: 'D# Minor', notes: ['D#', 'E#', 'F#', 'G#', 'A#', 'B', 'C#'], type: 'natural-minor' },
-  { name: 'A# Minor', notes: ['A#', 'B#', 'C#', 'D#', 'E#', 'F#', 'G#'], type: 'natural-minor' },
+  { name: 'A Natural Minor', notes: ['A', 'B', 'C', 'D', 'E', 'F', 'G'], type: 'natural-minor' },
+  { name: 'E Natural Minor', notes: ['E', 'F#', 'G', 'A', 'B', 'C', 'D'], type: 'natural-minor' },
+  { name: 'B Natural Minor', notes: ['B', 'C#', 'D', 'E', 'F#', 'G', 'A'], type: 'natural-minor' },
+  { name: 'F# Natural Minor', notes: ['F#', 'G#', 'A', 'B', 'C#', 'D', 'E'], type: 'natural-minor' },
+  { name: 'C# Natural Minor', notes: ['C#', 'D#', 'E', 'F#', 'G#', 'A', 'B'], type: 'natural-minor' },
+  { name: 'G# Natural Minor', notes: ['G#', 'A#', 'B', 'C#', 'D#', 'E', 'F#'], type: 'natural-minor' },
+  { name: 'D# Natural Minor', notes: ['D#', 'E#', 'F#', 'G#', 'A#', 'B', 'C#'], type: 'natural-minor' },
+  { name: 'A# Natural Minor', notes: ['A#', 'B#', 'C#', 'D#', 'E#', 'F#', 'G#'], type: 'natural-minor' },
 
   // Natural Minor Scales (Flat Keys)
-  { name: 'D Minor', notes: ['D', 'E', 'F', 'G', 'A', 'Bb', 'C'], type: 'natural-minor' },
-  { name: 'G Minor', notes: ['G', 'A', 'Bb', 'C', 'D', 'Eb', 'F'], type: 'natural-minor' },
-  { name: 'C Minor', notes: ['C', 'D', 'Eb', 'F', 'G', 'Ab', 'Bb'], type: 'natural-minor' },
-  { name: 'F Minor', notes: ['F', 'G', 'Ab', 'Bb', 'C', 'Db', 'Eb'], type: 'natural-minor' },
-  { name: 'Bb Minor', notes: ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'Ab'], type: 'natural-minor' },
-  { name: 'Eb Minor', notes: ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'Cb', 'Db'], type: 'natural-minor' },
-  { name: 'Ab Minor', notes: ['Ab', 'Bb', 'Cb', 'Db', 'Eb', 'Fb', 'Gb'], type: 'natural-minor' },
+  { name: 'D Natural Minor', notes: ['D', 'E', 'F', 'G', 'A', 'Bb', 'C'], type: 'natural-minor' },
+  { name: 'G Natural Minor', notes: ['G', 'A', 'Bb', 'C', 'D', 'Eb', 'F'], type: 'natural-minor' },
+  { name: 'C Natural Minor', notes: ['C', 'D', 'Eb', 'F', 'G', 'Ab', 'Bb'], type: 'natural-minor' },
+  { name: 'F Natural Minor', notes: ['F', 'G', 'Ab', 'Bb', 'C', 'Db', 'Eb'], type: 'natural-minor' },
+  { name: 'Bb Natural Minor', notes: ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'Ab'], type: 'natural-minor' },
+  { name: 'Eb Natural Minor', notes: ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'Cb', 'Db'], type: 'natural-minor' },
+  { name: 'Ab Natural Minor', notes: ['Ab', 'Bb', 'Cb', 'Db', 'Eb', 'Fb', 'Gb'], type: 'natural-minor' },
 
   // Harmonic Minor Scales (Sharp Keys)
   { name: 'A Harmonic Minor', notes: ['A', 'B', 'C', 'D', 'E', 'F', 'G#'], type: 'harmonic-minor' },
@@ -62,49 +62,49 @@ export const ALL_SCALES: Scale[] = [
   { 
     name: 'A Melodic Minor', 
     notes: ['A', 'B', 'C', 'D', 'E', 'F#', 'G#'],
-    notesDescending: ['A', 'G', 'F', 'E', 'D', 'C', 'B'],
+    notesDescending: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
     type: 'melodic-minor' 
   },
   { 
     name: 'E Melodic Minor', 
     notes: ['E', 'F#', 'G', 'A', 'B', 'C#', 'D#'],
-    notesDescending: ['E', 'D', 'C', 'B', 'A', 'G', 'F#'],
+    notesDescending: ['E', 'F#', 'G', 'A', 'B', 'C', 'D'],
     type: 'melodic-minor' 
   },
   { 
     name: 'B Melodic Minor', 
     notes: ['B', 'C#', 'D', 'E', 'F#', 'G#', 'A#'],
-    notesDescending: ['B', 'A', 'G', 'F#', 'E', 'D', 'C#'],
+    notesDescending: ['B', 'C#', 'D', 'E', 'F#', 'G', 'A'],
     type: 'melodic-minor' 
   },
   { 
     name: 'F# Melodic Minor', 
     notes: ['F#', 'G#', 'A', 'B', 'C#', 'D#', 'E#'],
-    notesDescending: ['F#', 'E', 'D', 'C#', 'B', 'A', 'G#'],
+    notesDescending: ['F#', 'G#', 'A', 'B', 'C#', 'D', 'E'],
     type: 'melodic-minor' 
   },
   { 
     name: 'C# Melodic Minor', 
     notes: ['C#', 'D#', 'E', 'F#', 'G#', 'A#', 'B#'],
-    notesDescending: ['C#', 'B', 'A', 'G#', 'F#', 'E', 'D#'],
+    notesDescending: ['C#', 'D#', 'E', 'F#', 'G#', 'A', 'B'],
     type: 'melodic-minor' 
   },
   { 
     name: 'G# Melodic Minor', 
     notes: ['G#', 'A#', 'B', 'C#', 'D#', 'E#', 'F##'],
-    notesDescending: ['G#', 'F#', 'E', 'D#', 'C#', 'B', 'A#'],
+    notesDescending: ['G#', 'A#', 'B', 'C#', 'D#', 'E', 'F#'],
     type: 'melodic-minor' 
   },
   { 
     name: 'D# Melodic Minor', 
     notes: ['D#', 'E#', 'F#', 'G#', 'A#', 'B#', 'C##'],
-    notesDescending: ['D#', 'C#', 'B', 'A#', 'G#', 'F#', 'E#'],
+    notesDescending: ['D#', 'E#', 'F#', 'G#', 'A#', 'B', 'C#'],
     type: 'melodic-minor' 
   },
   { 
     name: 'A# Melodic Minor', 
     notes: ['A#', 'B#', 'C#', 'D#', 'E#', 'F##', 'G##'],
-    notesDescending: ['A#', 'G#', 'F#', 'E#', 'D#', 'C#', 'B#'],
+    notesDescending: ['A#', 'B#', 'C#', 'D#', 'E#', 'F#', 'G#'],
     type: 'melodic-minor' 
   },
 
@@ -112,43 +112,43 @@ export const ALL_SCALES: Scale[] = [
   { 
     name: 'D Melodic Minor', 
     notes: ['D', 'E', 'F', 'G', 'A', 'B', 'C#'],
-    notesDescending: ['D', 'C', 'Bb', 'A', 'G', 'F', 'E'],
+    notesDescending: ['D', 'E', 'F', 'G', 'A', 'Bb', 'C'],
     type: 'melodic-minor' 
   },
   { 
     name: 'G Melodic Minor', 
     notes: ['G', 'A', 'Bb', 'C', 'D', 'E', 'F#'],
-    notesDescending: ['G', 'F', 'Eb', 'D', 'C', 'Bb', 'A'],
+    notesDescending: ['G', 'A', 'Bb', 'C', 'D', 'Eb', 'F'],
     type: 'melodic-minor' 
   },
   { 
     name: 'C Melodic Minor', 
     notes: ['C', 'D', 'Eb', 'F', 'G', 'A', 'B'],
-    notesDescending: ['C', 'Bb', 'Ab', 'G', 'F', 'Eb', 'D'],
+    notesDescending: ['C', 'D', 'Eb', 'F', 'G', 'Ab', 'Bb'],
     type: 'melodic-minor' 
   },
   { 
     name: 'F Melodic Minor', 
     notes: ['F', 'G', 'Ab', 'Bb', 'C', 'D', 'E'],
-    notesDescending: ['F', 'Eb', 'Db', 'C', 'Bb', 'Ab', 'G'],
+    notesDescending: ['F', 'G', 'Ab', 'Bb', 'C', 'Db', 'Eb'],
     type: 'melodic-minor' 
   },
   { 
     name: 'Bb Melodic Minor', 
     notes: ['Bb', 'C', 'Db', 'Eb', 'F', 'G', 'A'],
-    notesDescending: ['Bb', 'Ab', 'Gb', 'F', 'Eb', 'Db', 'C'],
+    notesDescending: ['Bb', 'C', 'Db', 'Eb', 'F', 'Gb', 'Ab'],
     type: 'melodic-minor' 
   },
   { 
     name: 'Eb Melodic Minor', 
     notes: ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'C', 'D'],
-    notesDescending: ['Eb', 'Db', 'Cb', 'Bb', 'Ab', 'Gb', 'F'],
+    notesDescending: ['Eb', 'F', 'Gb', 'Ab', 'Bb', 'Cb', 'Db'],
     type: 'melodic-minor' 
   },
   { 
     name: 'Ab Melodic Minor', 
     notes: ['Ab', 'Bb', 'Cb', 'Db', 'Eb', 'F', 'G'],
-    notesDescending: ['Ab', 'Gb', 'Fb', 'Eb', 'Db', 'Cb', 'Bb'],
+    notesDescending: ['Ab', 'Bb', 'Cb', 'Db', 'Eb', 'Fb', 'Gb'],
     type: 'melodic-minor' 
   },
 ];
@@ -160,12 +160,12 @@ export const ENHARMONIC_EQUIVALENTS: { [key: string]: string } = {
   'C# Major': 'Db Major',
   'B Major': 'Cb Major',
   'Cb Major': 'B Major',
-  'Ab Minor': 'G# Minor',
-  'G# Minor': 'Ab Minor',
-  'Eb Minor': 'D# Minor',
-  'D# Minor': 'Eb Minor',
-  'Bb Minor': 'A# Minor',
-  'A# Minor': 'Bb Minor',
+  'Ab Natural Minor': 'G# Natural Minor',
+  'G# Natural Minor': 'Ab Natural Minor',
+  'Eb Natural Minor': 'D# Natural Minor',
+  'D# Natural Minor': 'Eb Natural Minor',
+  'Bb Natural Minor': 'A# Natural Minor',
+  'A# Natural Minor': 'Bb Natural Minor',
   'Ab Harmonic Minor': 'G# Harmonic Minor',
   'G# Harmonic Minor': 'Ab Harmonic Minor',
   'Eb Harmonic Minor': 'D# Harmonic Minor',
@@ -189,7 +189,7 @@ export const SCALE_TYPE_LABELS: Record<string, string> = {
 
 export const DEFAULT_SCALE_SETTINGS = {
   major: true,
-  'natural-minor': true,
-  'harmonic-minor': false,
-  'melodic-minor': false,
+  'natural-minor': false,
+  'harmonic-minor': true,
+  'melodic-minor': true,
 };

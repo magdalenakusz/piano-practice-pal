@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { ALL_SCALES } from '../constants/scales';
 import { PianoKeyboard } from './PianoKeyboard';
+import { playScale, playScaleUpAndDown } from '../services/audioService';
 import type { Scale, ScaleType } from '../types';
 
 interface BrowseScalesScreenProps {
@@ -12,6 +13,18 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState<ScaleType | 'all'>('all');
   const [selectedScale, setSelectedScale] = useState<Scale | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handlePlayScale = (notes: string[], direction: 'ascending' | 'up-and-down') => {
+    setIsPlaying(true);
+    if (direction === 'up-and-down') {
+      playScaleUpAndDown(notes, 'medium');
+      setTimeout(() => setIsPlaying(false), notes.length * 2 * 450 + 200);
+    } else {
+      playScale(notes, 'medium');
+      setTimeout(() => setIsPlaying(false), notes.length * 450 + 200);
+    }
+  };
 
   const filteredScales = useMemo(() => {
     return ALL_SCALES.filter(scale => {
@@ -135,9 +148,41 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
                 <PianoKeyboard scaleNotes={selectedScale.notes} />
               </div>
 
+              {/* Audio Controls */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePlayScale(selectedScale.notes, 'ascending')}
+                  disabled={isPlaying}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isPlaying 
+                      ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                      : 'bg-purple-600 text-white hover:bg-purple-700'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                  </svg>
+                  Play
+                </button>
+                <button
+                  onClick={() => handlePlayScale(selectedScale.notes, 'up-and-down')}
+                  disabled={isPlaying}
+                  className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    isPlaying 
+                      ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                      : 'bg-green-600 text-white hover:bg-green-700'
+                  }`}
+                >
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+                  </svg>
+                  Up & Down
+                </button>
+              </div>
+
               <button
                 onClick={() => onSelectScale(selectedScale)}
-                className="w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors transform hover:scale-105"
+                className="w-full mt-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors transform hover:scale-105"
               >
                 Practice This Scale
               </button>

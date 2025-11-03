@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { PianoKeyboard } from './PianoKeyboard';
 import { ALL_SCALES, ENHARMONIC_EQUIVALENTS } from '../constants/scales';
+import { playScale, playScaleUpAndDown } from '../services/audioService';
 import type { Scale, ConfidenceLevel } from '../types';
 import type { UsePracticeDataReturn } from '../hooks/usePracticeData';
 
@@ -69,6 +70,7 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   onToggleDirection,
   isBrowseMode = false,
 }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
   const isMelodicMinor = scale.type === 'melodic-minor';
   const displayNotes = isMelodicMinor && showDescending && scale.notesDescending
     ? scale.notesDescending
@@ -77,6 +79,18 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   const equivalentNotes = equivalent && isMelodicMinor && showDescending && equivalent.notesDescending
     ? equivalent.notesDescending
     : equivalent?.notes;
+
+  const handlePlayScale = (direction: 'ascending' | 'up-and-down') => {
+    setIsPlaying(true);
+    if (direction === 'up-and-down') {
+      playScaleUpAndDown(displayNotes, 'medium');
+      // Calculate duration for animation
+      setTimeout(() => setIsPlaying(false), displayNotes.length * 2 * 450 + 200);
+    } else {
+      playScale(displayNotes, 'medium');
+      setTimeout(() => setIsPlaying(false), displayNotes.length * 450 + 200);
+    }
+  };
 
   return (
     <div>
@@ -123,6 +137,41 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
               Alt: <span className="font-mono tracking-tight">{equivalentNotes.join(' - ')}</span>
             </p>
           )}
+        </div>
+
+        {/* Audio Controls */}
+        <div className="flex justify-center gap-3 mb-4">
+          <button
+            onClick={() => handlePlayScale('ascending')}
+            disabled={isPlaying}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
+              isPlaying 
+                ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700'
+            }`}
+            title="Play scale once"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+            </svg>
+            {isPlaying ? 'Playing...' : 'Play Scale'}
+          </button>
+          
+          <button
+            onClick={() => handlePlayScale('up-and-down')}
+            disabled={isPlaying}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
+              isPlaying 
+                ? 'bg-gray-700 text-gray-500 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-green-600 to-teal-600 text-white hover:from-green-700 hover:to-teal-700'
+            }`}
+            title="Play scale up and down"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
+            </svg>
+            Up & Down
+          </button>
         </div>
 
         <PianoKeyboard scaleNotes={displayNotes} />

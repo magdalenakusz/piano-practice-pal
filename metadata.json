@@ -1,5 +1,5 @@
 {
   "name": "Piano Practice Pal",
-  "description": "A daily piano scale practice helper using spaced repetition to help you master all major and minor scales.",
+  "description": "A daily piano scale practice helper using spaced repetition to help you master all 95 major, natural minor, harmonic minor, and melodic minor scales.",
   "requestFramePermissions": []
 }

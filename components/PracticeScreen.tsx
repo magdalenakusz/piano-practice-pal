@@ -57,41 +57,86 @@ const FeedbackButtons: React.FC<FeedbackButtonsProps> = ({ onFeedback }) => (
 interface ScaleDisplayProps {
   scale: Scale;
   equivalent?: Scale;
+  showDescending?: boolean;
+  onToggleDirection?: () => void;
 }
 
-const ScaleDisplay: React.FC<ScaleDisplayProps> = ({ scale, equivalent }) => (
-  <div>
-    <h2 className="text-3xl font-semibold text-white mb-1">Today's Practice:</h2>
-    <p className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300 mb-4">
-      {scale.name}
-      {equivalent && <span className="text-3xl sm:text-4xl text-gray-400"> / {equivalent.name}</span>}
-    </p>
-    
-    <div className="mb-6">
-      <div className="text-lg text-gray-300 mb-4 text-center sm:text-left p-2 rounded-md bg-gray-900/50">
-        <p>Notes: <span className="font-mono tracking-tight">{scale.notes.join(' - ')}</span></p>
-        {equivalent && (
-          <p className="text-gray-400 text-base mt-1">
-            Alt: <span className="font-mono tracking-tight">{equivalent.notes.join(' - ')}</span>
-          </p>
-        )}
-      </div>
+const ScaleDisplay: React.FC<ScaleDisplayProps> = ({ 
+  scale, 
+  equivalent,
+  showDescending = false,
+  onToggleDirection
+}) => {
+  const isMelodicMinor = scale.type === 'melodic-minor';
+  const displayNotes = isMelodicMinor && showDescending && scale.notesDescending
+    ? scale.notesDescending
+    : scale.notes;
+  
+  const equivalentNotes = equivalent && isMelodicMinor && showDescending && equivalent.notesDescending
+    ? equivalent.notesDescending
+    : equivalent?.notes;
 
-      <PianoKeyboard scaleNotes={scale.notes} />
+  return (
+    <div>
+      <h2 className="text-3xl font-semibold text-white mb-1">Today's Practice:</h2>
+      <p className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300 mb-4">
+        {scale.name}
+        {equivalent && <span className="text-3xl sm:text-4xl text-gray-400"> / {equivalent.name}</span>}
+      </p>
       
-      <div className="mt-4 flex items-center justify-center space-x-4">
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 rounded-full bg-green-500"></div>
-          <span className="text-sm">Root Note</span>
+      {isMelodicMinor && onToggleDirection && (
+        <div className="flex justify-center mb-4">
+          <div className="inline-flex rounded-lg bg-gray-900/50 p-1">
+            <button
+              onClick={() => onToggleDirection()}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                !showDescending 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              Ascending
+            </button>
+            <button
+              onClick={() => onToggleDirection()}
+              className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                showDescending 
+                  ? 'bg-blue-600 text-white' 
+                  : 'text-gray-400 hover:text-gray-200'
+              }`}
+            >
+              Descending
+            </button>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 rounded-full bg-blue-500"></div>
-          <span className="text-sm">Scale Note</span>
+      )}
+      
+      <div className="mb-6">
+        <div className="text-lg text-gray-300 mb-4 text-center sm:text-left p-2 rounded-md bg-gray-900/50">
+          <p>Notes: <span className="font-mono tracking-tight">{displayNotes.join(' - ')}</span></p>
+          {equivalent && equivalentNotes && (
+            <p className="text-gray-400 text-base mt-1">
+              Alt: <span className="font-mono tracking-tight">{equivalentNotes.join(' - ')}</span>
+            </p>
+          )}
+        </div>
+
+        <PianoKeyboard scaleNotes={displayNotes} />
+        
+        <div className="mt-4 flex items-center justify-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 rounded-full bg-green-500"></div>
+            <span className="text-sm">Root Note</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 rounded-full bg-blue-500"></div>
+            <span className="text-sm">Scale Note</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
   dailyScales,
@@ -101,6 +146,7 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
   startNewSession,
 }) => {
   const [practiceStep, setPracticeStep] = useState<'practice' | 'feedback'>('practice');
+  const [showDescending, setShowDescending] = useState<boolean>(false);
 
   const { currentScale, equivalentScale } = useMemo(() => {
     const current = dailyScales[currentIndex];
@@ -115,6 +161,7 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
   const onFeedback = (confidence: ConfidenceLevel) => {
     handleFeedback(confidence);
     setPracticeStep('practice');
+    setShowDescending(false); // Reset for next scale
   };
 
   if (isSessionComplete) {
@@ -132,7 +179,12 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
   return (
     <>
       <div className="min-h-[28rem] flex flex-col justify-between">
-        <ScaleDisplay scale={currentScale} equivalent={equivalentScale} />
+        <ScaleDisplay 
+          scale={currentScale} 
+          equivalent={equivalentScale}
+          showDescending={showDescending}
+          onToggleDirection={currentScale.type === 'melodic-minor' ? () => setShowDescending(!showDescending) : undefined}
+        />
 
         {practiceStep === 'practice' ? (
           <button

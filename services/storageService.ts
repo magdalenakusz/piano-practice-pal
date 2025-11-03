@@ -1,7 +1,9 @@
-import type { PracticeData, ConfidenceLevel } from '../types';
+import type { PracticeData, ConfidenceLevel, UserSettings, ScaleTypeSettings } from '../types';
+import { DEFAULT_SCALE_SETTINGS } from '../constants/scales';
 
 const PRACTICE_DATA_KEY = 'pianoPracticeData';
 const DAILY_PRACTICE_KEY = 'dailyPianoPractice';
+const USER_SETTINGS_KEY = 'pianoUserSettings';
 
 function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
@@ -85,4 +87,36 @@ export function clearAllData(): void {
   } catch (error) {
     console.error('Failed to reset data from localStorage', error);
   }
+}
+
+// User Settings
+
+export function getUserSettings(): UserSettings {
+  try {
+    const data = localStorage.getItem(USER_SETTINGS_KEY);
+    if (data) {
+      const settings = JSON.parse(data);
+      return {
+        enabledScaleTypes: { ...DEFAULT_SCALE_SETTINGS, ...settings.enabledScaleTypes }
+      };
+    }
+  } catch (error) {
+    console.error('Failed to read user settings from localStorage', error);
+  }
+  return { enabledScaleTypes: DEFAULT_SCALE_SETTINGS };
+}
+
+export function saveUserSettings(settings: UserSettings): void {
+  try {
+    localStorage.setItem(USER_SETTINGS_KEY, JSON.stringify(settings));
+  } catch (error) {
+    console.error('Failed to write user settings to localStorage', error);
+  }
+}
+
+export function updateScaleTypeSettings(scaleTypeSettings: ScaleTypeSettings): UserSettings {
+  const settings = getUserSettings();
+  settings.enabledScaleTypes = scaleTypeSettings;
+  saveUserSettings(settings);
+  return settings;
 }

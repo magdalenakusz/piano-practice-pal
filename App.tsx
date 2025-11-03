@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { usePracticeData } from './hooks/usePracticeData';
 import { PracticeScreen } from './components/PracticeScreen';
 import { StatsScreen } from './components/StatsScreen';
+import { SettingsScreen } from './components/SettingsScreen';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'practice' | 'stats'>('practice');
+  const [view, setView] = useState<'practice' | 'stats' | 'settings'>('practice');
   const practiceManager = usePracticeData();
 
   if (practiceManager.loading) {
@@ -32,16 +33,27 @@ const App: React.FC = () => {
           <p className="text-lg text-gray-400">
             {view === 'practice'
               ? 'Your daily dose of scales to master the keys.'
-              : 'Review your progress and find areas to improve.'
+              : view === 'stats'
+              ? 'Review your progress and find areas to improve.'
+              : 'Customize your practice experience.'
             }
           </p>
           {view === 'practice' && (
-            <button
-              onClick={() => setView('stats')}
-              className="mt-4 text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              View Practice History
-            </button>
+            <div className="mt-4 flex justify-center gap-4">
+              <button
+                onClick={() => setView('stats')}
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                View Practice History
+              </button>
+              <span className="text-gray-600">|</span>
+              <button
+                onClick={() => setView('settings')}
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Scale Settings
+              </button>
+            </div>
           )}
         </header>
 
@@ -51,6 +63,15 @@ const App: React.FC = () => {
               practiceData={practiceManager.practiceData}
               onClose={() => setView('practice')}
               onReset={handleReset}
+            />
+          ) : view === 'settings' ? (
+            <SettingsScreen
+              scaleTypeSettings={practiceManager.userSettings.enabledScaleTypes}
+              onSave={(settings) => {
+                practiceManager.updateSettings({ enabledScaleTypes: settings });
+                setView('practice');
+              }}
+              onClose={() => setView('practice')}
             />
           ) : (
             <PracticeScreen {...practiceManager} />

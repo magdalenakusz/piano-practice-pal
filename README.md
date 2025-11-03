@@ -8,17 +8,24 @@ A clean, simple web app designed to help you master all piano scales through dai
 
 - **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
 - **Spaced Repetition**: Scales you need more work on appear more frequently
+- **Customizable Scale Types**: Choose which scale types to include in your practice (Major, Natural Minor, Harmonic Minor, Melodic Minor)
+- **Direction Toggle**: For melodic minor scales, switch between ascending and descending forms
 - **Visual Piano Keyboard**: See exactly which notes to play with highlighted keys
-- **Progress Tracking**: Track your confidence level and practice history for all 35 major and minor scales
+- **Progress Tracking**: Track your confidence level and practice history for all 95 scales
 - **Enharmonic Support**: Automatically shows enharmonic equivalents (e.g., F# Major / Gb Major)
+- **Proper Music Notation**: Uses correct theoretical notation including double sharps (##) and double flats (bb)
 - **Mobile-Friendly**: Fully responsive design works on all devices and screen sizes
 - **Offline-Ready**: All data stored locally in your browser - no account required
 
 ## 🎯 Scale Coverage
 
-The app includes all standard piano scales:
-- **15 Major Scales**: C, G, D, A, E, B, F#, C#, F, Bb, Eb, Ab, Db, Gb, Cb
-- **20 Minor Scales**: A, E, B, F#, C#, G#, D#, A#, D, G, C, F, Bb, Eb, Ab (natural minor)
+The app includes all standard piano scales with theoretically correct notation:
+- **15 Major Scales**: C, G, D, A, E, B, F#/Gb, C#/Db, F, Bb, Eb, Ab, Db, Gb, Cb
+- **20 Natural Minor Scales**: A, E, B, F#, C#, G#/Ab, D#/Eb, A#/Bb, D, G, C, F, Bb, Eb, Ab
+- **20 Harmonic Minor Scales**: All keys with raised 7th degree
+- **20 Melodic Minor Scales**: All keys with raised 6th and 7th degrees ascending, natural 6th and 7th descending
+
+**Note**: Double sharps (##) and double flats (bb) are used where music theory demands, ensuring scales follow proper key signatures and conventions.
 
 ## 🚀 Getting Started
 
@@ -70,10 +77,21 @@ npm run preview
 1. **Practice Mode** (default view):
    - See your daily selected scales
    - View the notes on a visual piano keyboard
+   - For melodic minor scales, toggle between ascending ↑ and descending ↓ forms
    - Click "I've Practiced This Scale" when done
    - Rate your confidence: Needs Work / Getting There / Mastered
 
-2. **Stats View**:
+2. **Scale Settings**:
+   - Click "Scale Settings" in the header
+   - Toggle which scale types you want to practice:
+     - Major (enabled by default)
+     - Natural Minor (enabled by default)
+     - Harmonic Minor (disabled by default)
+     - Melodic Minor (disabled by default)
+   - Changes take effect immediately and new scales will be selected
+   - Perfect for beginners who want to start with just major scales, or advanced players who want to focus on specific types
+
+3. **Stats View**:
    - Click "View Practice History" to see all scales
    - Sort by name, recent practice, or confidence level
    - Track your progress over time

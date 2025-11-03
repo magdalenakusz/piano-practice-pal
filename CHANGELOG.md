@@ -1,5 +1,51 @@
 # Changelog
 
+## Version 1.1.0 - Scale Customization & Music Theory Enhancements (2025-11-03)
+
+### 🎯 New Features
+
+#### Scale Settings System
+- **Settings Screen**: New dedicated screen for customizing which scale types to practice
+- **Scale Type Toggles**: Enable/disable Major, Natural Minor, Harmonic Minor, and Melodic Minor scales independently
+- **Smart Defaults**: Major and Natural Minor enabled by default for beginners
+- **Live Updates**: Scale selection updates immediately when settings are changed
+- **Persistent Settings**: User preferences saved to localStorage
+
+#### Melodic Minor Direction Toggle
+- **Ascending/Descending Forms**: Melodic minor scales now show both directions
+- **Interactive Toggle**: Switch between ascending (↑) and descending (↓) forms during practice
+- **Proper Theory**: Ascending uses raised 6th and 7th; descending uses natural minor scale
+
+#### Music Theory Accuracy
+- **Double Sharps**: Properly uses F##, G##, C## where theoretically correct (e.g., D# Major, G# Major)
+- **Double Flats**: Uses Bbb, Abb where required
+- **Enharmonic Equivalents**: Maintains proper key signature theory while showing enharmonic alternatives
+
+### 📊 Scale Coverage
+- **95 Total Scales**: Complete coverage of all standard piano scales
+  - 15 Major scales
+  - 20 Natural Minor scales  
+  - 20 Harmonic Minor scales
+  - 20 Melodic Minor scales (with both ascending and descending forms)
+
+### 🔧 Technical Improvements
+- **Type System**: Extended with `ScaleType`, `ScaleTypeSettings`, `UserSettings` types
+- **Storage Service**: Added user settings management functions
+- **Practice Algorithm**: Updated to filter scales by enabled types
+- **Component Architecture**: New `SettingsScreen` component with clean UI
+
+### 🎨 UI/UX Enhancements
+- **Settings Button**: Added to main header for easy access
+- **Scale Type Labels**: Clear descriptions for each scale type
+- **Direction Indicators**: Visual arrows (↑/↓) for melodic minor direction
+- **Count Display**: Shows how many scale types are currently enabled
+- **Sorting Default**: Changed default sort to "Last Practiced" for better workflow
+
+### 📦 Bundle Size
+- Production build: 219KB (gzipped: 67KB)
+
+---
+
 ## Version 1.0.0 - Clean & Polished Release (2025-11-03)
 
 ### 🎉 Major Improvements

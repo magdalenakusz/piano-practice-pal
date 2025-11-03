@@ -1,5 +1,5 @@
 import { ALL_SCALES, ENHARMONIC_EQUIVALENTS } from '../constants/scales';
-import type { Scale, PracticeData } from '../types';
+import type { Scale, PracticeData, ScaleTypeSettings } from '../types';
 
 const NUM_DAILY_SCALES = 2;
 
@@ -12,11 +12,18 @@ const NUM_DAILY_SCALES = 2;
  * - Small random factor for variety
  * 
  * Enharmonic equivalents are treated as the same scale to avoid duplication.
+ * Only includes scale types that are enabled in user settings.
  */
-export function selectNewScales(practiceData: PracticeData): Scale[] {
+export function selectNewScales(
+  practiceData: PracticeData, 
+  enabledScaleTypes: ScaleTypeSettings
+): Scale[] {
   const today = new Date();
 
-  const scoredScales = ALL_SCALES
+  // Filter scales based on enabled types
+  const availableScales = ALL_SCALES.filter(scale => enabledScaleTypes[scale.type]);
+
+  const scoredScales = availableScales
     .map(scale => {
       const entry = practiceData[scale.name] || { lastPracticed: null, confidence: 1 };
       

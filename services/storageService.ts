@@ -7,14 +7,14 @@ function getTodayDateString(): string {
   return new Date().toISOString().split('T')[0];
 }
 
-// --- Practice Data (History) ---
+// Practice Data (History)
 
 export function getPracticeData(): PracticeData {
   try {
     const data = localStorage.getItem(PRACTICE_DATA_KEY);
     return data ? JSON.parse(data) : {};
-  } catch (e) {
-    console.error("Failed to read practice data from localStorage", e);
+  } catch (error) {
+    console.error('Failed to read practice data from localStorage', error);
     return {};
   }
 }
@@ -22,8 +22,8 @@ export function getPracticeData(): PracticeData {
 export function savePracticeData(data: PracticeData): void {
   try {
     localStorage.setItem(PRACTICE_DATA_KEY, JSON.stringify(data));
-  } catch (e) {
-    console.error("Failed to write practice data to localStorage", e);
+  } catch (error) {
+    console.error('Failed to write practice data to localStorage', error);
   }
 }
 
@@ -37,7 +37,7 @@ export function updatePracticeData(scaleName: string, confidence: ConfidenceLeve
   return data;
 }
 
-// --- Daily Practice Session ---
+// Daily Practice Session
 
 export function getDailyPractice(): string[] | null {
   const todayStr = getTodayDateString();
@@ -49,8 +49,8 @@ export function getDailyPractice(): string[] | null {
         return dailyPractice.scales;
       }
     }
-  } catch (e) {
-    console.error("Failed to read daily practice from localStorage", e);
+  } catch (error) {
+    console.error('Failed to read daily practice from localStorage', error);
   }
   return null;
 }
@@ -63,27 +63,26 @@ export function saveDailyPractice(scaleNames: string[]): void {
   };
   try {
     localStorage.setItem(DAILY_PRACTICE_KEY, JSON.stringify(newDailyPractice));
-  } catch (e) {
-    console.error("Failed to write daily practice to localStorage", e);
+  } catch (error) {
+    console.error('Failed to write daily practice to localStorage', error);
   }
 }
 
 export function clearDailyPractice(): void {
   try {
     localStorage.removeItem(DAILY_PRACTICE_KEY);
-  } catch (e) {
-    console.error("Failed to clear daily practice from localStorage", e);
+  } catch (error) {
+    console.error('Failed to clear daily practice from localStorage', error);
   }
 }
 
-// --- Reset ---
+// Reset
 
 export function clearAllData(): void {
   try {
-    // Use removeItem as it is the most direct and standard way to clear keys.
     localStorage.removeItem(PRACTICE_DATA_KEY);
     localStorage.removeItem(DAILY_PRACTICE_KEY);
-  } catch (e) {
-    console.error("Failed to reset data from localStorage", e);
+  } catch (error) {
+    console.error('Failed to reset data from localStorage', error);
   }
 }

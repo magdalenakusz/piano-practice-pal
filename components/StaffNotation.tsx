@@ -179,14 +179,14 @@ export default function StaffNotation({ notes, scaleName, activeNoteIndex = -1 }
       Renderer.Backends.SVG
     );
     
-    // Set dimensions - wider to accommodate 8 notes
-    const width = 700;
+    // Set dimensions - wider to accommodate 8 notes + key signatures with many accidentals
+    const width = 800;
     const height = 150;
     renderer.resize(width, height);
     
     const context = renderer.getContext();
     
-    // Create a stave (staff)
+    // Create a stave (staff) - increased left margin for key signatures with 6-7 accidentals
     const stave = new Stave(10, 20, width - 20);
     
     // Add treble clef
@@ -199,11 +199,15 @@ export default function StaffNotation({ notes, scaleName, activeNoteIndex = -1 }
     if (keySignature.sharps) {
       // VexFlow expects key signature format like 'G' for 1 sharp, 'D' for 2 sharps, etc.
       const sharpKeys = ['', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
-      stave.addKeySignature(sharpKeys[keySignature.sharps]);
+      const keyString = sharpKeys[keySignature.sharps];
+      console.log(`[StaffNotation] ${scaleName} → ${keySignature.sharps} sharps → Key: ${keyString}`);
+      stave.addKeySignature(keyString);
     } else if (keySignature.flats) {
       // VexFlow expects key signature format like 'F' for 1 flat, 'Bb' for 2 flats, etc.
       const flatKeys = ['', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb'];
-      stave.addKeySignature(flatKeys[keySignature.flats]);
+      const keyString = flatKeys[keySignature.flats];
+      console.log(`[StaffNotation] ${scaleName} → ${keySignature.flats} flats → Key: ${keyString}`);
+      stave.addKeySignature(keyString);
     }
     
     // Add time signature (not strictly needed for scales, but looks professional)

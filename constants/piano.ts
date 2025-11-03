@@ -19,7 +19,8 @@ export const PIANO_KEYS = [
 
 export const noteEquivalents: { [key: string]: string } = {
     'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#', 'Bb': 'A#',
-    'E#': 'F', 'B#': 'C', 'Cb': 'B', 'Fb': 'E'
+    'E#': 'F', 'B#': 'C', 'Cb': 'B', 'Fb': 'E',
+    'C##': 'D', 'F##': 'G', 'G##': 'A'  // Double sharps
 };
 
 export const blackKeyPositions: { [key: string]: number } = {

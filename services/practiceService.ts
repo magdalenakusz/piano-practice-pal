@@ -1,4 +1,4 @@
-import { ALL_SCALES, ENHARMONIC_EQUIVALENTS } from '../constants/scales';
+import { ALL_SCALES } from '../constants/scales';
 import type { Scale, PracticeData, ScaleTypeSettings } from '../types';
 
 const NUM_DAILY_SCALES = 2;
@@ -11,7 +11,7 @@ const NUM_DAILY_SCALES = 2;
  * - Time since last practice (longer = higher priority)
  * - Small random factor for variety
  * 
- * Enharmonic equivalents are treated as the same scale to avoid duplication.
+ * Scales with alternative names (enharmonic equivalents) are not duplicated.
  * Only includes scale types that are enabled in user settings.
  */
 export function selectNewScales(
@@ -57,9 +57,9 @@ export function selectNewScales(
     selectedScales.push(scale);
     pickedScaleNames.add(scale.name);
 
-    const equivalentName = ENHARMONIC_EQUIVALENTS[scale.name];
-    if (equivalentName) {
-      pickedScaleNames.add(equivalentName);
+    // Also block the alternative enharmonic name if it exists
+    if (scale.altName) {
+      pickedScaleNames.add(scale.altName);
     }
   }
 

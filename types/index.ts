@@ -5,6 +5,7 @@ export interface Scale {
   notes: string[];
   notesDescending?: string[]; // For melodic minor
   type: ScaleType;
+  altName?: string; // Alternative enharmonic name (e.g., "G# Harmonic Minor" for Ab Harmonic Minor)
 }
 
 export interface ScaleTypeSettings {

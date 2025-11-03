@@ -20,19 +20,40 @@ import { Renderer, Stave, StaveNote, Voice, Formatter, Accidental } from 'vexflo
 interface StaffNotationProps {
   notes: string[];
   scaleName: string;
+  activeNoteIndex?: number; // Index of currently playing note
 }
 
-// Map note names to VexFlow note positions
-// VexFlow uses format: "c/4" for middle C, "d/4" for D above middle C, etc.
-function convertToVexFlowNote(note: string, octave: number): { keys: string[]; accidentals: string[] } {
+// Map note names to VexFlow note positions with proper accidental handling
+// Takes into account the key signature to determine if naturals are needed
+function convertToVexFlowNote(
+  note: string, 
+  octave: number, 
+  keySignature: { sharps?: number; flats?: number }
+): { keys: string[]; accidentals: string[] } {
   const baseNote = note.charAt(0).toLowerCase();
   const accidental = note.substring(1);
   
   // VexFlow notation: note/octave (e.g., "c/4", "d#/4", "eb/5")
   let vexNote = `${baseNote}/${octave}`;
   
-  // Handle accidentals
+  // Determine what accidentals are in the key signature
+  const keySigFlats = ['', 'b', 'e', 'a', 'd', 'g', 'c', 'f']; // Order of flats: Bb, Eb, Ab, Db, Gb, Cb, Fb
+  const keySigSharps = ['', 'f', 'c', 'g', 'd', 'a', 'e', 'b']; // Order of sharps: F#, C#, G#, D#, A#, E#, B#
+  
+  const notesInKeySig = new Set<string>();
+  if (keySignature.flats) {
+    for (let i = 1; i <= keySignature.flats; i++) {
+      notesInKeySig.add(keySigFlats[i]);
+    }
+  } else if (keySignature.sharps) {
+    for (let i = 1; i <= keySignature.sharps; i++) {
+      notesInKeySig.add(keySigSharps[i]);
+    }
+  }
+  
+  // Determine what accidental to show
   let accidentalSymbol = '';
+  
   if (accidental === '#') {
     accidentalSymbol = '#';
   } else if (accidental === 'b') {
@@ -41,6 +62,12 @@ function convertToVexFlowNote(note: string, octave: number): { keys: string[]; a
     accidentalSymbol = '##';
   } else if (accidental === 'bb') {
     accidentalSymbol = 'bb';
+  } else if (accidental === '') {
+    // Natural note - check if it needs a natural sign
+    // If the key signature has this note as flat/sharp, we need a natural sign
+    if (notesInKeySig.has(baseNote)) {
+      accidentalSymbol = 'n'; // Natural sign
+    }
   }
   
   return {
@@ -113,32 +140,30 @@ function calculateOctavesForScale(notes: string[]): number[] {
   
   const noteLetterPositions = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
   
-  const firstNoteLetter = notes[0].charAt(0);
-  const firstPosition = noteLetterPositions.indexOf(firstNoteLetter);
-  let currentOctave = firstPosition <= 2 ? 4 : 3;
+  // ALWAYS start at octave 4 to match the visible keyboard range (C4-B5)
+  let currentOctave = 4;
+  let previousBase = notes[0].charAt(0);
   
   const octaves: number[] = [];
   
   for (let i = 0; i < notes.length; i++) {
-    octaves.push(currentOctave);
+    const currentBase = notes[i].charAt(0);
+    const currentPos = noteLetterPositions.indexOf(currentBase);
+    const prevPos = noteLetterPositions.indexOf(previousBase);
     
-    if (i < notes.length - 1) {
-      const currentBase = notes[i].charAt(0);
-      const nextBase = notes[i + 1].charAt(0);
-      
-      const currentPos = noteLetterPositions.indexOf(currentBase);
-      const nextPos = noteLetterPositions.indexOf(nextBase);
-      
-      if (nextPos < currentPos) {
-        currentOctave++;
-      }
+    // Increment octave when we cross from B to C (or wrap around)
+    if (i > 0 && currentPos < prevPos) {
+      currentOctave++;
     }
+    
+    octaves.push(currentOctave);
+    previousBase = currentBase;
   }
   
   return octaves;
 }
 
-export default function StaffNotation({ notes, scaleName }: StaffNotationProps) {
+export default function StaffNotation({ notes, scaleName, activeNoteIndex = -1 }: StaffNotationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
@@ -154,8 +179,8 @@ export default function StaffNotation({ notes, scaleName }: StaffNotationProps) 
       Renderer.Backends.SVG
     );
     
-    // Set dimensions
-    const width = 600;
+    // Set dimensions - wider to accommodate 8 notes
+    const width = 700;
     const height = 150;
     renderer.resize(width, height);
     
@@ -167,8 +192,10 @@ export default function StaffNotation({ notes, scaleName }: StaffNotationProps) 
     // Add treble clef
     stave.addClef('treble');
     
-    // Add key signature
+    // Get key signature (will be used later for accidental determination too)
     const keySignature = getKeySignature(scaleName);
+    
+    // Add key signature to the stave
     if (keySignature.sharps) {
       // VexFlow expects key signature format like 'G' for 1 sharp, 'D' for 2 sharps, etc.
       const sharpKeys = ['', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#'];
@@ -185,12 +212,15 @@ export default function StaffNotation({ notes, scaleName }: StaffNotationProps) 
     // Draw the stave
     stave.setContext(context).draw();
     
-    // Calculate octaves for notes
-    const octaves = calculateOctavesForScale(notes);
+    // Add octave note to complete the scale (do-re-mi-fa-sol-la-ti-do)
+    const notesWithOctave = [...notes, notes[0]];
+    
+    // Calculate octaves for notes (including the octave)
+    const octaves = calculateOctavesForScale(notesWithOctave);
     
     // Convert notes to VexFlow format
-    const vexNotes = notes.map((note, index) => {
-      const { keys, accidentals } = convertToVexFlowNote(note, octaves[index]);
+    const vexNotes = notesWithOctave.map((note, index) => {
+      const { keys, accidentals } = convertToVexFlowNote(note, octaves[index], keySignature);
       
       const staveNote = new StaveNote({
         keys: keys,
@@ -202,12 +232,17 @@ export default function StaffNotation({ notes, scaleName }: StaffNotationProps) 
         staveNote.addModifier(new Accidental(accidentals[0]), 0);
       }
       
+      // Highlight the active note being played
+      if (index === activeNoteIndex) {
+        staveNote.setStyle({ fillStyle: '#EAB308', strokeStyle: '#EAB308' }); // Yellow
+      }
+      
       return staveNote;
     });
     
     // Create a voice and add notes
     const voice = new Voice({
-      numBeats: notes.length,
+      numBeats: notesWithOctave.length,
       beatValue: 4
     });
     voice.addTickables(vexNotes);
@@ -226,7 +261,7 @@ export default function StaffNotation({ notes, scaleName }: StaffNotationProps) 
       }
     }
     
-  }, [notes, scaleName]);
+  }, [notes, scaleName, activeNoteIndex]);
   
   return (
     <div className="staff-notation-container">

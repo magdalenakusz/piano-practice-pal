@@ -15,21 +15,42 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
   const [selectedType, setSelectedType] = useState<ScaleType | 'all'>('all');
   const [selectedScale, setSelectedScale] = useState<Scale | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
+  const [activeNote, setActiveNote] = useState('');
 
   const handlePlayScale = (notes: string[], direction: 'ascending' | 'up-and-down') => {
     setIsPlaying(true);
+    
+    const noteCallback = (index: number, note: string) => {
+      setActiveNoteIndex(index);
+      setActiveNote(note);
+    };
+    
     if (direction === 'up-and-down') {
-      playScaleUpAndDown(notes, 'medium');
-      setTimeout(() => setIsPlaying(false), notes.length * 2 * 450 + 200);
+      playScaleUpAndDown(notes, 'medium', noteCallback);
+      // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
+      setTimeout(() => {
+        setIsPlaying(false);
+        setActiveNoteIndex(-1);
+        setActiveNote('');
+      }, (notes.length * 2 + 1) * 450 + 200);
     } else {
-      playScale(notes, 'medium');
-      setTimeout(() => setIsPlaying(false), notes.length * 450 + 200);
+      playScale(notes, 'medium', noteCallback);
+      // Calculate duration: notes + octave note
+      setTimeout(() => {
+        setIsPlaying(false);
+        setActiveNoteIndex(-1);
+        setActiveNote('');
+      }, (notes.length + 1) * 450 + 200);
     }
   };
 
   const filteredScales = useMemo(() => {
     return ALL_SCALES.filter(scale => {
-      const matchesSearch = scale.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = 
+        scale.name.toLowerCase().includes(searchLower) ||
+        (scale.altName && scale.altName.toLowerCase().includes(searchLower));
       const matchesType = selectedType === 'all' || scale.type === selectedType;
       return matchesSearch && matchesType;
     });
@@ -117,7 +138,14 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
           {selectedScale ? (
             <div className="space-y-4">
               <div>
-                <h3 className="text-2xl font-bold text-white mb-2">{selectedScale.name}</h3>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  {selectedScale.name}
+                  {selectedScale.altName && (
+                    <span className="text-base font-normal text-gray-400 ml-2">
+                      (also known as {selectedScale.altName})
+                    </span>
+                  )}
+                </h3>
                 <div className="inline-block px-3 py-1 bg-blue-600/20 text-blue-400 rounded-full text-sm">
                   {selectedScale.type === 'major' && 'Major'}
                   {selectedScale.type === 'natural-minor' && 'Natural Minor'}
@@ -147,12 +175,12 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
               {/* Musical Staff Notation */}
               <div>
                 <div className="text-sm text-gray-400 mb-2">Musical Notation:</div>
-                <StaffNotation notes={selectedScale.notes} scaleName={selectedScale.name} />
+                <StaffNotation notes={selectedScale.notes} scaleName={selectedScale.name} activeNoteIndex={activeNoteIndex} />
               </div>
 
               <div>
                 <div className="text-sm text-gray-400 mb-2">Piano Keyboard:</div>
-                <PianoKeyboard scaleNotes={selectedScale.notes} />
+                <PianoKeyboard scaleNotes={selectedScale.notes} activeNoteIndex={activeNoteIndex} activeNote={activeNote} />
               </div>
 
               {/* Audio Controls */}

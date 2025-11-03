@@ -48,8 +48,23 @@ const BASE_NOTE_FREQUENCIES: { [key: string]: number } = {
 // Note order for determining position in scale
 const NOTE_ORDER = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
+// Map enharmonic notes to their base note for octave calculation
+const ENHARMONIC_BASE_MAP: { [key: string]: string } = {
+  'Cb': 'B',  // C-flat is B
+  'B#': 'C',  // B-sharp is C
+  'E#': 'F',  // E-sharp is F
+  'Fb': 'E',  // F-flat is E
+  'C##': 'D', // C-double-sharp is D
+  'F##': 'G', // F-double-sharp is G
+  'G##': 'A', // G-double-sharp is A
+};
+
 function getNoteBase(noteName: string): string {
-  // Extract the base note (first character)
+  // Check if this is an enharmonic note that maps to a different base
+  if (ENHARMONIC_BASE_MAP[noteName]) {
+    return ENHARMONIC_BASE_MAP[noteName];
+  }
+  // Otherwise extract the base note (first character)
   return noteName.charAt(0);
 }
 
@@ -65,34 +80,42 @@ function getNoteFrequency(noteName: string, octave: number = 4): number {
 function calculateOctavesForScale(notes: string[]): number[] {
   if (notes.length === 0) return [];
   
-  // Determine starting octave based on the first note
-  // This keeps all scales in a comfortable listening range
-  const firstNoteBase = getNoteBase(notes[0]);
-  const firstNotePos = NOTE_ORDER.indexOf(firstNoteBase);
-  
-  // Start lower notes (C, D, E) in octave 4
-  // Start higher notes (F, F#, G, A, B) in octave 3 (so they don't get too high)
-  let currentOctave = firstNotePos <= 2 ? 4 : 3;
+  // ALWAYS start at octave 4 to match the visible keyboard range (C4-B5)
+  // This ensures all notes are visible and highlighted correctly
+  let currentOctave = 4;
   
   const octaves: number[] = [];
+  // For octave detection, use the ORIGINAL note letter (before enharmonic mapping)
+  // This prevents B# from being treated as C for octave boundary detection
+  let previousLetter = notes[0].charAt(0);
   
   for (let i = 0; i < notes.length; i++) {
-    octaves.push(currentOctave);
+    const note = notes[i];
+    const currentLetter = note.charAt(0);
+    const currentPos = NOTE_ORDER.indexOf(currentLetter);
+    const prevPos = NOTE_ORDER.indexOf(previousLetter);
     
-    if (i < notes.length - 1) {
-      const currentBase = getNoteBase(notes[i]);
-      const nextBase = getNoteBase(notes[i + 1]);
-      
-      const currentPos = NOTE_ORDER.indexOf(currentBase);
-      const nextPos = NOTE_ORDER.indexOf(nextBase);
-      
-      // If next note's letter comes before current in the alphabet, we've crossed into next octave
-      // Exception: If we go from B to C, that's expected (next octave)
-      if (nextPos < currentPos) {
-        // This is normal scale progression (e.g., B to C)
-        currentOctave++;
-      }
+    // Increment octave when we cross from B to C (or wrap around)
+    // This happens when current position is less than previous AND
+    // it's the natural B(6) -> C(0) progression
+    if (i > 0 && currentPos < prevPos) {
+      currentOctave++;
     }
+    
+    // Adjust octave for enharmonic equivalents that cross octave boundaries
+    // B# is actually C of the next octave, E# is actually F of the same octave
+    // Cb is actually B of the previous octave, Fb is actually E of the same octave
+    let adjustedOctave = currentOctave;
+    if (note === 'B#' || note === 'B##') {
+      // B# is C of the next octave
+      adjustedOctave = currentOctave + 1;
+    } else if (note === 'Cb') {
+      // Cb is B of the previous octave
+      adjustedOctave = currentOctave - 1;
+    }
+    
+    octaves.push(adjustedOctave);
+    previousLetter = currentLetter;
   }
   
   return octaves;
@@ -138,7 +161,17 @@ function playNote(frequency: number, duration: number, startTime: number): void 
   oscillator.stop(now + duration);
 }
 
-export function playScale(notes: string[], tempo: 'slow' | 'medium' | 'fast' = 'medium'): void {
+/**
+ * Play a scale with optional note-by-note callback for animations
+ * @param notes - Array of note names
+ * @param tempo - Playback speed
+ * @param onNotePlay - Optional callback fired when each note starts playing (noteIndex, note)
+ */
+export function playScale(
+  notes: string[], 
+  tempo: 'slow' | 'medium' | 'fast' = 'medium',
+  onNotePlay?: (noteIndex: number, note: string) => void
+): void {
   const ctx = getAudioContext();
   
   // Resume audio context if it's suspended (required by browser autoplay policies)
@@ -146,28 +179,55 @@ export function playScale(notes: string[], tempo: 'slow' | 'medium' | 'fast' = '
     ctx.resume();
   }
   
+  // Add the octave (root note one octave higher) to complete the scale
+  const notesWithOctave = [...notes, notes[0]];
+  
   // Slight overlap for smooth flow, but not too much
   const noteDuration = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.5 : 0.35;
   const noteInterval = tempo === 'slow' ? 0.6 : tempo === 'medium' ? 0.45 : 0.3;
   
   const startTime = ctx.currentTime + 0.1; // Small delay to ensure smooth start
   
-  // Calculate proper octaves for the scale
-  const octaves = calculateOctavesForScale(notes);
+  // Calculate proper octaves for the scale (including the octave note)
+  const octaves = calculateOctavesForScale(notesWithOctave);
   
-  notes.forEach((note, index) => {
+  notesWithOctave.forEach((note, index) => {
     const frequency = getNoteFrequency(note, octaves[index]);
     if (frequency) {
       playNote(frequency, noteDuration, startTime + (index * noteInterval));
+      
+      // Schedule animation callback with full note including octave
+      if (onNotePlay) {
+        const noteWithOctave = note + octaves[index];
+        const delayMs = (startTime - ctx.currentTime + (index * noteInterval)) * 1000;
+        // Pass the actual index - components can handle octave note specially if needed
+        setTimeout(() => onNotePlay(index, noteWithOctave), Math.max(0, delayMs));
+      }
     } else {
       console.warn(`Unknown note: ${note}`);
     }
   });
+  
+  // Schedule callback to clear animation after last note finishes
+  if (onNotePlay) {
+    const lastNoteTime = startTime + (notesWithOctave.length * noteInterval) + noteDuration;
+    const delayMs = (lastNoteTime - ctx.currentTime) * 1000;
+    setTimeout(() => onNotePlay(-1, ''), Math.max(0, delayMs));
+  }
 }
 
-export function playScaleUpAndDown(notes: string[], tempo: 'slow' | 'medium' | 'fast' = 'medium'): void {
-  const ascending = [...notes];
-  const descending = [...notes].reverse().slice(1); // Remove duplicate root note
+/**
+ * Play a scale up and down with optional animation callback
+ */
+export function playScaleUpAndDown(
+  notes: string[], 
+  tempo: 'slow' | 'medium' | 'fast' = 'medium',
+  onNotePlay?: (noteIndex: number, note: string) => void
+): void {
+  // Add octave note at the end of ascending
+  const ascending = [...notes, notes[0]];
+  // Descending: from the octave down to (but not including) the root
+  const descending = [...notes, notes[0]].reverse().slice(1);
   const fullScale = [...ascending, ...descending];
   
   // Calculate octaves for the full scale (up and down)
@@ -183,9 +243,9 @@ export function playScaleUpAndDown(notes: string[], tempo: 'slow' | 'medium' | '
   
   const startTime = ctx.currentTime + 0.1;
   
-  // Calculate octaves for ascending
+  // Calculate octaves for ascending (including octave note)
   const ascendingOctaves = calculateOctavesForScale(ascending);
-  // For descending, reverse the octaves and remove the duplicate root
+  // For descending, reverse the octaves and remove the duplicate top note
   const descendingOctaves = [...ascendingOctaves].reverse().slice(1);
   const allOctaves = [...ascendingOctaves, ...descendingOctaves];
   
@@ -193,8 +253,35 @@ export function playScaleUpAndDown(notes: string[], tempo: 'slow' | 'medium' | '
     const frequency = getNoteFrequency(note, allOctaves[index]);
     if (frequency) {
       playNote(frequency, noteDuration, startTime + (index * noteInterval));
+      
+      // Schedule animation callback with full note including octave
+      // Map the fullScale index back to the display notes array (8 notes including octave)
+      if (onNotePlay) {
+        let displayIndex: number;
+        if (index < ascending.length) {
+          // Ascending phase - pass actual index (0-7 for 8 notes)
+          displayIndex = index;
+        } else {
+          // Descending phase - map back to display notes
+          // ascending.length = 8, so descending starts at index 8
+          // descending goes: index 8->6, 9->5, 10->4, 11->3, 12->2, 13->1, 14->0
+          const descendingPosition = index - ascending.length;
+          displayIndex = (notes.length - 1) - descendingPosition; // notes.length=7, so 6, 5, 4, 3, 2, 1, 0
+        }
+        
+        const noteWithOctave = note + allOctaves[index];
+        const delayMs = (startTime - ctx.currentTime + (index * noteInterval)) * 1000;
+        setTimeout(() => onNotePlay(displayIndex, noteWithOctave), Math.max(0, delayMs));
+      }
     }
   });
+  
+  // Schedule callback to clear animation after last note finishes
+  if (onNotePlay) {
+    const lastNoteTime = startTime + (fullScale.length * noteInterval) + noteDuration;
+    const delayMs = (lastNoteTime - ctx.currentTime) * 1000;
+    setTimeout(() => onNotePlay(-1, ''), Math.max(0, delayMs));
+  }
 }
 
 export function playChord(notes: string[], duration: number = 1.5): void {

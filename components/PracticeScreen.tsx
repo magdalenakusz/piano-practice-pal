@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { PianoKeyboard } from './PianoKeyboard';
 import StaffNotation from './StaffNotation';
-import { ALL_SCALES, ENHARMONIC_EQUIVALENTS } from '../constants/scales';
+import { ALL_SCALES, getEnharmonicEquivalent } from '../constants/scales';
 import { playScale, playScaleUpAndDown } from '../services/audioService';
 import type { Scale, ConfidenceLevel } from '../types';
 import type { UsePracticeDataReturn } from '../hooks/usePracticeData';
@@ -72,6 +72,9 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   isBrowseMode = false,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
+  const [activeNote, setActiveNote] = useState('');
+
   const isMelodicMinor = scale.type === 'melodic-minor';
   const displayNotes = isMelodicMinor && showDescending && scale.notesDescending
     ? scale.notesDescending
@@ -81,15 +84,31 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
     ? equivalent.notesDescending
     : equivalent?.notes;
 
-  const handlePlayScale = (direction: 'ascending' | 'up-and-down') => {
+    const handlePlay = (mode: 'single' | 'upAndDown') => {
     setIsPlaying(true);
-    if (direction === 'up-and-down') {
-      playScaleUpAndDown(displayNotes, 'medium');
-      // Calculate duration for animation
-      setTimeout(() => setIsPlaying(false), displayNotes.length * 2 * 450 + 200);
+    
+    const noteCallback = (index: number, note: string) => {
+      setActiveNoteIndex(index);
+      setActiveNote(note);
+    };
+    
+    if (mode === 'upAndDown') {
+      playScaleUpAndDown(displayNotes, 'medium', noteCallback);
+      // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
+      // (notes.length + 1) * 2 - 1 = notes.length * 2 + 1
+      setTimeout(() => {
+        setIsPlaying(false);
+        setActiveNoteIndex(-1);
+        setActiveNote('');
+      }, (displayNotes.length * 2 + 1) * 450 + 200);
     } else {
-      playScale(displayNotes, 'medium');
-      setTimeout(() => setIsPlaying(false), displayNotes.length * 450 + 200);
+      playScale(displayNotes, 'medium', noteCallback);
+      // Calculate duration: notes + octave note
+      setTimeout(() => {
+        setIsPlaying(false);
+        setActiveNoteIndex(-1);
+        setActiveNote('');
+      }, (displayNotes.length + 1) * 450 + 200);
     }
   };
 
@@ -143,7 +162,7 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
         {/* Audio Controls */}
         <div className="flex justify-center gap-3 mb-4">
           <button
-            onClick={() => handlePlayScale('ascending')}
+            onClick={() => handlePlay('single')}
             disabled={isPlaying}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
               isPlaying 
@@ -159,7 +178,7 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
           </button>
           
           <button
-            onClick={() => handlePlayScale('up-and-down')}
+            onClick={() => handlePlay('upAndDown')}
             disabled={isPlaying}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
               isPlaying 
@@ -176,9 +195,17 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
         </div>
 
         {/* Musical Staff Notation */}
-        <StaffNotation notes={displayNotes} scaleName={scale.name} />
+        <StaffNotation 
+          notes={displayNotes} 
+          scaleName={scale.name}
+          activeNoteIndex={activeNoteIndex}
+        />
 
-        <PianoKeyboard scaleNotes={displayNotes} />
+        <PianoKeyboard 
+          scaleNotes={displayNotes}
+          activeNoteIndex={activeNoteIndex}
+          activeNote={activeNote}
+        />
         
         <div className="mt-4 flex items-center justify-center space-x-4">
           <div className="flex items-center space-x-2">
@@ -188,6 +215,10 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 rounded-full bg-blue-500"></div>
             <span className="text-sm">Scale Note</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-4 h-4 rounded-full bg-yellow-500 animate-pulse"></div>
+            <span className="text-sm">Now Playing</span>
           </div>
         </div>
       </div>
@@ -212,8 +243,7 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn & { overrideScale?: 
     if (!current) {
       return { currentScale: undefined, equivalentScale: undefined };
     }
-    const equivalentName = ENHARMONIC_EQUIVALENTS[current.name];
-    const equivalent = equivalentName ? ALL_SCALES.find(s => s.name === equivalentName) : undefined;
+    const equivalent = current.altName ? getEnharmonicEquivalent(current.altName) : undefined;
     return { currentScale: current, equivalentScale: equivalent };
   }, [currentIndex, dailyScales, overrideScale]);
 
@@ -229,11 +259,7 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn & { overrideScale?: 
   }
 
   if (!currentScale) {
-    return (
-      <div className="min-h-[28rem] flex items-center justify-center">
-        No more scales for today.
-      </div>
-    );
+    return <CompletionScreen onStartNewSession={startNewSession} />;
   }
 
   return (

@@ -181,13 +181,13 @@ export default function StaffNotation({ notes, scaleName, activeNoteIndex = -1 }
     
     // Set dimensions - wider to accommodate 8 notes + key signatures with many accidentals
     const width = 800;
-    const height = 150;
+    const height = 110; // Reduced from 150 to minimize white space
     renderer.resize(width, height);
     
     const context = renderer.getContext();
     
     // Create a stave (staff) - increased left margin for key signatures with 6-7 accidentals
-    const stave = new Stave(10, 20, width - 20);
+    const stave = new Stave(10, 10, width - 20); // Reduced top margin from 20 to 10
     
     // Add treble clef
     stave.addClef('treble');
@@ -272,8 +272,8 @@ export default function StaffNotation({ notes, scaleName, activeNoteIndex = -1 }
         .staff-notation-container {
           background: white;
           border-radius: 8px;
-          padding: 16px;
-          margin: 16px 0;
+          padding: 8px 12px;
+          margin: 12px 0;
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         .vexflow-container {

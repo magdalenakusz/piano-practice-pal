@@ -122,12 +122,40 @@ function calculateOctavesForScale(notes: string[]): number[] {
 }
 
 let audioContext: AudioContext | null = null;
+let isAudioInitialized = false;
 
 function getAudioContext(): AudioContext {
   if (!audioContext) {
     audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
   return audioContext;
+}
+
+/**
+ * Initialize and unlock audio context on iOS
+ * Must be called from a user interaction event (tap, click)
+ */
+export function initializeAudio(): void {
+  if (isAudioInitialized) return;
+  
+  const ctx = getAudioContext();
+  
+  // Resume audio context if suspended (required on iOS)
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+  
+  // Play a silent sound to unlock audio on iOS
+  // This is required for PWAs on iOS home screen
+  const oscillator = ctx.createOscillator();
+  const gainNode = ctx.createGain();
+  gainNode.gain.value = 0; // Silent
+  oscillator.connect(gainNode);
+  gainNode.connect(ctx.destination);
+  oscillator.start(ctx.currentTime);
+  oscillator.stop(ctx.currentTime + 0.01);
+  
+  isAudioInitialized = true;
 }
 
 function playNote(frequency: number, duration: number, startTime: number): void {
@@ -173,6 +201,11 @@ export function playScale(
   onNotePlay?: (noteIndex: number, note: string) => void
 ): void {
   const ctx = getAudioContext();
+  
+  // Initialize audio if not already done (important for iOS PWA)
+  if (!isAudioInitialized) {
+    initializeAudio();
+  }
   
   // Resume audio context if it's suspended (required by browser autoplay policies)
   if (ctx.state === 'suspended') {
@@ -233,6 +266,11 @@ export function playScaleUpAndDown(
   // Calculate octaves for the full scale (up and down)
   const ctx = getAudioContext();
   
+  // Initialize audio if not already done (important for iOS PWA)
+  if (!isAudioInitialized) {
+    initializeAudio();
+  }
+  
   if (ctx.state === 'suspended') {
     ctx.resume();
   }
@@ -286,6 +324,11 @@ export function playScaleUpAndDown(
 
 export function playChord(notes: string[], duration: number = 1.5): void {
   const ctx = getAudioContext();
+  
+  // Initialize audio if not already done (important for iOS PWA)
+  if (!isAudioInitialized) {
+    initializeAudio();
+  }
   
   if (ctx.state === 'suspended') {
     ctx.resume();

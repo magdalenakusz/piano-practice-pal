@@ -1,15 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePracticeData } from './hooks/usePracticeData';
 import { PracticeScreen } from './components/PracticeScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsScreen } from './components/SettingsScreen';
 import { BrowseScalesScreen } from './components/BrowseScalesScreen';
+import { initializeAudio } from './services/audioService';
 import type { Scale } from './types';
 
 const App: React.FC = () => {
   const [view, setView] = useState<'practice' | 'stats' | 'settings' | 'browse'>('practice');
   const [selectedScale, setSelectedScale] = useState<Scale | null>(null);
   const practiceManager = usePracticeData();
+
+  // Initialize audio on first user interaction (required for iOS PWA)
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      initializeAudio();
+      // Remove listeners after first interaction
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('click', handleFirstInteraction);
+    };
+
+    document.addEventListener('touchstart', handleFirstInteraction, { passive: true });
+    document.addEventListener('click', handleFirstInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleFirstInteraction);
+      document.removeEventListener('click', handleFirstInteraction);
+    };
+  }, []);
 
   if (practiceManager.loading) {
     return (

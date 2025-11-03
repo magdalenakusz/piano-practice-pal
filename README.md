@@ -7,6 +7,7 @@ A clean, simple web app designed to help you master all piano scales through dai
 ## ✨ Features
 
 - **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
+- **Browse All Scales**: Browse and select any scale from the complete catalog of 95 scales
 - **Spaced Repetition**: Scales you need more work on appear more frequently
 - **Customizable Scale Types**: Choose which scale types to include in your practice (Major, Natural Minor, Harmonic Minor, Melodic Minor)
 - **Direction Toggle**: For melodic minor scales, switch between ascending and descending forms
@@ -81,23 +82,31 @@ npm run preview
    - Click "I've Practiced This Scale" when done
    - Rate your confidence: Needs Work / Getting There / Mastered
 
-2. **Scale Settings**:
+2. **Browse All Scales**:
+   - Click "Browse All Scales" in the header
+   - Search for scales by name (e.g., "C", "Minor", "Harmonic")
+   - Filter by scale type (Major, Natural Minor, Harmonic Minor, Melodic Minor)
+   - Preview any scale with the piano keyboard visualization
+   - Click "Practice This Scale" to practice it immediately
+   - Perfect for working on specific scales or exploring the full catalog
+
+3. **Scale Settings**:
    - Click "Scale Settings" in the header
    - Toggle which scale types you want to practice:
      - Major (enabled by default)
-     - Natural Minor (enabled by default)
-     - Harmonic Minor (disabled by default)
-     - Melodic Minor (disabled by default)
+     - Natural Minor (disabled by default)
+     - Harmonic Minor (enabled by default)
+     - Melodic Minor (enabled by default)
    - Changes take effect immediately and new scales will be selected
    - Perfect for beginners who want to start with just major scales, or advanced players who want to focus on specific types
 
-3. **Stats View**:
+4. **Stats View**:
    - Click "View Practice History" to see all scales
    - Sort by name, recent practice, or confidence level
    - Track your progress over time
    - Reset all data if you want to start fresh
 
-3. **New Session**:
+5. **New Session**:
    - Complete all daily scales to unlock a new session
    - Start practicing more scales whenever you want
 

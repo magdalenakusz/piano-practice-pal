@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { ScaleTypeSettings } from '../types';
-import { SCALE_TYPE_LABELS } from '../constants/scales';
+import { SCALE_TYPE_LABELS, DEFAULT_SCALE_SETTINGS } from '../constants/scales';
 
 interface SettingsScreenProps {
   scaleTypeSettings: ScaleTypeSettings;
@@ -28,12 +28,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
   };
 
   const handleReset = () => {
-    setSettings({
-      major: true,
-      'natural-minor': true,
-      'harmonic-minor': false,
-      'melodic-minor': false,
-    });
+    setSettings(DEFAULT_SCALE_SETTINGS);
   };
 
   const scaleTypes: Array<keyof ScaleTypeSettings> = [

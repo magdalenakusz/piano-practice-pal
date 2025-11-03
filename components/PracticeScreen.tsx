@@ -59,13 +59,15 @@ interface ScaleDisplayProps {
   equivalent?: Scale;
   showDescending?: boolean;
   onToggleDirection?: () => void;
+  isBrowseMode?: boolean;
 }
 
 const ScaleDisplay: React.FC<ScaleDisplayProps> = ({ 
   scale, 
   equivalent,
   showDescending = false,
-  onToggleDirection
+  onToggleDirection,
+  isBrowseMode = false,
 }) => {
   const isMelodicMinor = scale.type === 'melodic-minor';
   const displayNotes = isMelodicMinor && showDescending && scale.notesDescending
@@ -78,7 +80,9 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
 
   return (
     <div>
-      <h2 className="text-3xl font-semibold text-white mb-1">Today's Practice:</h2>
+      <h2 className="text-3xl font-semibold text-white mb-1">
+        {isBrowseMode ? 'Selected Scale:' : 'Today\'s Practice:'}
+      </h2>
       <p className="text-4xl sm:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300 mb-4">
         {scale.name}
         {equivalent && <span className="text-3xl sm:text-4xl text-gray-400"> / {equivalent.name}</span>}
@@ -138,25 +142,27 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   );
 };
 
-export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
+export const PracticeScreen: React.FC<UsePracticeDataReturn & { overrideScale?: Scale | null }> = ({
   dailyScales,
   currentIndex,
   isSessionComplete,
   handleFeedback,
   startNewSession,
+  overrideScale,
 }) => {
   const [practiceStep, setPracticeStep] = useState<'practice' | 'feedback'>('practice');
   const [showDescending, setShowDescending] = useState<boolean>(false);
 
   const { currentScale, equivalentScale } = useMemo(() => {
-    const current = dailyScales[currentIndex];
+    // If there's an override scale, use it instead of the daily scale
+    const current = overrideScale || dailyScales[currentIndex];
     if (!current) {
       return { currentScale: undefined, equivalentScale: undefined };
     }
     const equivalentName = ENHARMONIC_EQUIVALENTS[current.name];
     const equivalent = equivalentName ? ALL_SCALES.find(s => s.name === equivalentName) : undefined;
     return { currentScale: current, equivalentScale: equivalent };
-  }, [currentIndex, dailyScales]);
+  }, [currentIndex, dailyScales, overrideScale]);
 
   const onFeedback = (confidence: ConfidenceLevel) => {
     handleFeedback(confidence);
@@ -179,11 +185,20 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
   return (
     <>
       <div className="min-h-[28rem] flex flex-col justify-between">
+        {overrideScale && (
+          <div className="mb-4 p-3 bg-blue-600/20 border border-blue-500/30 rounded-lg text-center">
+            <p className="text-blue-300 text-sm">
+              🎯 You selected this scale from the catalog
+            </p>
+          </div>
+        )}
+        
         <ScaleDisplay 
           scale={currentScale} 
           equivalent={equivalentScale}
           showDescending={showDescending}
           onToggleDirection={currentScale.type === 'melodic-minor' ? () => setShowDescending(!showDescending) : undefined}
+          isBrowseMode={!!overrideScale}
         />
 
         {practiceStep === 'practice' ? (
@@ -197,7 +212,7 @@ export const PracticeScreen: React.FC<UsePracticeDataReturn> = ({
           <FeedbackButtons onFeedback={onFeedback} />
         )}
       </div>
-      {dailyScales.length > 1 && (
+      {!overrideScale && dailyScales.length > 1 && (
         <div className="mt-6 text-center text-gray-400">
           Scale {currentIndex + 1} of {dailyScales.length}
         </div>

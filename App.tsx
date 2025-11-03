@@ -3,9 +3,12 @@ import { usePracticeData } from './hooks/usePracticeData';
 import { PracticeScreen } from './components/PracticeScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsScreen } from './components/SettingsScreen';
+import { BrowseScalesScreen } from './components/BrowseScalesScreen';
+import type { Scale } from './types';
 
 const App: React.FC = () => {
-  const [view, setView] = useState<'practice' | 'stats' | 'settings'>('practice');
+  const [view, setView] = useState<'practice' | 'stats' | 'settings' | 'browse'>('practice');
+  const [selectedScale, setSelectedScale] = useState<Scale | null>(null);
   const practiceManager = usePracticeData();
 
   if (practiceManager.loading) {
@@ -23,6 +26,16 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSelectScaleFromBrowse = (scale: Scale) => {
+    setSelectedScale(scale);
+    setView('practice');
+  };
+
+  const handleFeedbackWithClear = (...args: Parameters<typeof practiceManager.handleFeedback>) => {
+    practiceManager.handleFeedback(...args);
+    setSelectedScale(null); // Clear selected scale after feedback
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-200 font-sans flex flex-col items-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-2xl mx-auto text-center">
@@ -35,11 +48,20 @@ const App: React.FC = () => {
               ? 'Your daily dose of scales to master the keys.'
               : view === 'stats'
               ? 'Review your progress and find areas to improve.'
+              : view === 'browse'
+              ? 'Choose any scale from the catalog to practice.'
               : 'Customize your practice experience.'
             }
           </p>
           {view === 'practice' && (
-            <div className="mt-4 flex justify-center gap-4">
+            <div className="mt-4 flex justify-center gap-4 flex-wrap">
+              <button
+                onClick={() => setView('browse')}
+                className="text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Browse All Scales
+              </button>
+              <span className="text-gray-600">|</span>
               <button
                 onClick={() => setView('stats')}
                 className="text-blue-400 hover:text-blue-300 transition-colors"
@@ -73,8 +95,17 @@ const App: React.FC = () => {
               }}
               onClose={() => setView('practice')}
             />
+          ) : view === 'browse' ? (
+            <BrowseScalesScreen
+              onClose={() => setView('practice')}
+              onSelectScale={handleSelectScaleFromBrowse}
+            />
           ) : (
-            <PracticeScreen {...practiceManager} />
+            <PracticeScreen 
+              {...practiceManager} 
+              handleFeedback={handleFeedbackWithClear}
+              overrideScale={selectedScale} 
+            />
           )}
         </main>
       </div>

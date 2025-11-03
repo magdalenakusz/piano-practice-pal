@@ -56,7 +56,7 @@ const SortButton: React.FC<SortButtonProps> = ({ currentSortKey, targetSortKey, 
 );
 
 export const StatsScreen: React.FC<StatsScreenProps> = ({ practiceData, onClose, onReset }) => {
-  const [sortKey, setSortKey] = useState<SortKey>('name');
+  const [sortKey, setSortKey] = useState<SortKey>('lastPracticed');
 
   const sortedScales = useMemo(() => {
     return [...ALL_SCALES].sort((a, b) => {

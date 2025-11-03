@@ -129,8 +129,9 @@ export function playScale(notes: string[], tempo: 'slow' | 'medium' | 'fast' = '
     ctx.resume();
   }
   
-  const noteDuration = tempo === 'slow' ? 0.6 : tempo === 'medium' ? 0.4 : 0.25;
-  const noteInterval = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.45 : 0.3;
+  // Slight overlap for smooth flow, but not too much
+  const noteDuration = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.5 : 0.35;
+  const noteInterval = tempo === 'slow' ? 0.6 : tempo === 'medium' ? 0.45 : 0.3;
   
   const startTime = ctx.currentTime + 0.1; // Small delay to ensure smooth start
   
@@ -159,8 +160,9 @@ export function playScaleUpAndDown(notes: string[], tempo: 'slow' | 'medium' | '
     ctx.resume();
   }
   
-  const noteDuration = tempo === 'slow' ? 0.6 : tempo === 'medium' ? 0.4 : 0.25;
-  const noteInterval = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.45 : 0.3;
+  // Slight overlap for smooth flow, but not too much
+  const noteDuration = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.5 : 0.35;
+  const noteInterval = tempo === 'slow' ? 0.6 : tempo === 'medium' ? 0.45 : 0.3;
   
   const startTime = ctx.currentTime + 0.1;
   

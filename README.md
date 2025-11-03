@@ -5,7 +5,9 @@ A clean, simple web app designed to help you master all piano scales through dai
 ## ✨ Features
 
 - **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
+- **Daily Scale Selection**: Smart algorithm selects 2 scales per day based on your practice history and confidence levels
 - **Browse All Scales**: Browse and select any scale from the complete catalog of 95 scales
+- **Audio Playback**: Hear each scale played with realistic piano tones (Web Audio API)
 - **Spaced Repetition**: Scales you need more work on appear more frequently
 - **Customizable Scale Types**: Choose which scale types to include in your practice (Major, Natural Minor, Harmonic Minor, Melodic Minor)
 - **Direction Toggle**: For melodic minor scales, switch between ascending and descending forms
@@ -77,6 +79,7 @@ npm run preview
 1. **Practice Mode** (default view):
    - See your daily selected scales
    - View the notes on a visual piano keyboard
+   - **🔊 Listen**: Click "Play Scale" to hear it, or "Up & Down" to hear it ascending and descending
    - For melodic minor scales, toggle between ascending ↑ and descending ↓ forms
    - Click "I've Practiced This Scale" when done
    - Rate your confidence: Needs Work / Getting There / Mastered
@@ -86,6 +89,7 @@ npm run preview
    - Search for scales by name (e.g., "C", "Minor", "Harmonic")
    - Filter by scale type (Major, Natural Minor, Harmonic Minor, Melodic Minor)
    - Preview any scale with the piano keyboard visualization
+   - **🔊 Listen**: Use the "Play" and "Up & Down" buttons to hear each scale
    - Click "Practice This Scale" to practice it immediately
    - Perfect for working on specific scales or exploring the full catalog
 

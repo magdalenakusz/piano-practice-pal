@@ -4,6 +4,7 @@ import { PracticeScreen } from './components/PracticeScreen';
 import { StatsScreen } from './components/StatsScreen';
 import { SettingsScreen } from './components/SettingsScreen';
 import { BrowseScalesScreen } from './components/BrowseScalesScreen';
+import { InstallPrompt } from './components/InstallPrompt';
 import { initializeAudio } from './services/audioService';
 import type { Scale } from './types';
 
@@ -78,21 +79,21 @@ const App: React.FC = () => {
                 onClick={() => setView('browse')}
                 className="text-blue-400 hover:text-blue-300 transition-colors"
               >
-                Browse All Scales
+                Browse Scales
               </button>
               <span className="text-gray-600">|</span>
               <button
                 onClick={() => setView('stats')}
                 className="text-blue-400 hover:text-blue-300 transition-colors"
               >
-                View Practice History
+                History
               </button>
               <span className="text-gray-600">|</span>
               <button
                 onClick={() => setView('settings')}
                 className="text-blue-400 hover:text-blue-300 transition-colors"
               >
-                Scale Settings
+                Settings
               </button>
             </div>
           )}
@@ -128,6 +129,9 @@ const App: React.FC = () => {
           )}
         </main>
       </div>
+
+      {/* Install prompt for PWA */}
+      <InstallPrompt />
     </div>
   );
 };

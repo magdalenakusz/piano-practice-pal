@@ -98,7 +98,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
           onClick={handleReset}
           className="flex-1 px-6 py-3 border border-gray-600 text-base font-medium rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-gray-500 transition-colors"
         >
-          Reset to Default
+          Reset
         </button>
         <button
           onClick={onClose}
@@ -118,7 +118,7 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
             }
           `}
         >
-          Save Settings
+          Save
         </button>
       </div>
     </>

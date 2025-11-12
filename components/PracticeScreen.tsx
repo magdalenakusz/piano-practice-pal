@@ -100,32 +100,45 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
     }
     
     // Reverse the descending notes (stored in ascending order)
-    const reversedNotes = [...scale.notesDescending].reverse();
-    // Add root note at the beginning (octave above) since playScale adds notes[0] as octave
-    const playbackNotes = [reversedNotes[reversedNotes.length - 1], ...reversedNotes];
+    // playScale will add the octave (notes[0]) automatically, so we just reverse
+    const playbackNotes = [...scale.notesDescending].reverse();
+    
+    // playbackNotes = [A, G, F#, E, D, C#, B] (7 notes, descending)
+    // playScale adds notes[0] (A) as octave -> [A, G, F#, E, D, C#, B, A] (8 notes)
+    // But we want [B_high, A, G, F#, E, D, C#, B_low]
+    
+    // Actually, we need to reverse the logic:
+    // We want to play from high to low, starting with root octave
+    // So we need: [B, A, G, F#, E, D, C#] and let playScale add B at the end
+    const reversedWithoutRoot = [...scale.notesDescending].reverse().slice(1);
+    const finalPlaybackNotes = [scale.notes[0], ...reversedWithoutRoot];
+    
+    // finalPlaybackNotes = [B, A, G, F#, E, D, C#] (7 notes)
+    // playScale adds notes[0] (B) as octave -> [B, A, G, F#, E, D, C#, B] (8 notes) ✓
     
     // Create callback that maps playback indices to display indices
     const mappedCallback = (index: number, note: string) => {
       if (index === -1) {
         setActiveNoteIndex(-1);
         setActiveNote(note);
-      } else if (index === 0) {
-        // First note is octave root - highlight the root (index 0 in display)
+      } else if (index === 0 || index === 7) {
+        // First and last notes are both root B - highlight index 0
         setActiveNoteIndex(0);
         setActiveNote(note);
       } else {
         // Map descending playback to ascending display
         // displayNotes = [B, C#, D, E, F#, G, A] (7 notes)
-        // playbackNotes = [B, A, G, F#, E, D, C#, B] (8 notes with octave)
-        // index 1 (A) -> displayIndex 6 (A)
-        // index 7 (B) -> displayIndex 0 (B)
+        // finalPlaybackNotes = [B, A, G, F#, E, D, C#] (7 notes)
+        // playScale adds octave -> [B, A, G, F#, E, D, C#, B] (8 notes)
+        // index 1 (A) -> displayIndex 6 (A in display)
+        // index 2 (G) -> displayIndex 5 (G in display)
         const displayIndex = displayNotes.length - index;
         setActiveNoteIndex(displayIndex);
         setActiveNote(note);
       }
     };
     
-    return { playbackNotes, mappedCallback };
+    return { playbackNotes: finalPlaybackNotes, mappedCallback };
   };
 
   const handlePlay = (mode: 'single' | 'upAndDown') => {

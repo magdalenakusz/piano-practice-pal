@@ -18,7 +18,7 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
   const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
   const [activeNote, setActiveNote] = useState('');
 
-  const handlePlayScale = (notes: string[], direction: 'ascending' | 'up-and-down') => {
+  const handlePlayScale = (scale: Scale, direction: 'ascending' | 'up-and-down') => {
     setIsPlaying(true);
     
     const noteCallback = (index: number, note: string) => {
@@ -27,21 +27,25 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
     };
     
     if (direction === 'up-and-down') {
-      playScaleUpAndDown(notes, 'medium', noteCallback);
+      // For melodic minor, pass the descending notes (natural minor form)
+      const descendingNotes = scale.type === 'melodic-minor' && scale.notesDescending 
+        ? scale.notesDescending 
+        : undefined;
+      playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes);
       // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
       setTimeout(() => {
         setIsPlaying(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
-      }, (notes.length * 2 + 1) * 450 + 200);
+      }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
-      playScale(notes, 'medium', noteCallback);
+      playScale(scale.notes, 'medium', noteCallback);
       // Calculate duration: notes + octave note
       setTimeout(() => {
         setIsPlaying(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
-      }, (notes.length + 1) * 450 + 200);
+      }, (scale.notes.length + 1) * 450 + 200);
     }
   };
 
@@ -186,7 +190,7 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
               {/* Audio Controls */}
               <div className="flex gap-2">
                 <button
-                  onClick={() => handlePlayScale(selectedScale.notes, 'ascending')}
+                  onClick={() => handlePlayScale(selectedScale, 'ascending')}
                   disabled={isPlaying}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                     isPlaying 
@@ -200,7 +204,7 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
                   Play
                 </button>
                 <button
-                  onClick={() => handlePlayScale(selectedScale.notes, 'up-and-down')}
+                  onClick={() => handlePlayScale(selectedScale, 'up-and-down')}
                   disabled={isPlaying}
                   className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                     isPlaying 

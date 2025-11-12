@@ -246,12 +246,16 @@ export function playScale(
 export function playScaleUpAndDown(
   notes: string[], 
   tempo: 'slow' | 'medium' | 'fast' = 'medium',
-  onNotePlay?: (noteIndex: number, note: string) => void
+  onNotePlay?: (noteIndex: number, note: string) => void,
+  notesDescending?: string[]
 ): void {
   // Add octave note at the end of ascending
   const ascending = [...notes, notes[0]];
   // Descending: from the octave down to (but not including) the root
-  const descending = [...notes, notes[0]].reverse().slice(1);
+  // For melodic minor, use the provided notesDescending array
+  const descending = notesDescending 
+    ? [...notesDescending].slice(1) // notesDescending already includes octave, skip the root to avoid duplicate
+    : [...notes, notes[0]].reverse().slice(1);
   const fullScale = [...ascending, ...descending];
   
   // Calculate octaves for the full scale (up and down)

@@ -93,14 +93,18 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
     };
     
     if (mode === 'upAndDown') {
-      playScaleUpAndDown(displayNotes, 'medium', noteCallback);
+      // For melodic minor, pass the descending notes (natural minor form)
+      const descendingNotes = isMelodicMinor && scale.notesDescending 
+        ? scale.notesDescending 
+        : undefined;
+      playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes);
       // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
       // (notes.length + 1) * 2 - 1 = notes.length * 2 + 1
       setTimeout(() => {
         setIsPlaying(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
-      }, (displayNotes.length * 2 + 1) * 450 + 200);
+      }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
       playScale(displayNotes, 'medium', noteCallback);
       // Calculate duration: notes + octave note

@@ -222,7 +222,25 @@ export function playScale(
       
       // Schedule animation callback with full note including octave
       if (onNotePlay) {
-        const noteWithOctave = note + octaves[index];
+        // For enharmonic notes, adjust octave for display
+        // E.g., B# in octave 4 should display as C5
+        let displayOctave = octaves[index];
+        if (ENHARMONIC_BASE_MAP[note]) {
+          const baseNote = ENHARMONIC_BASE_MAP[note];
+          const originalLetter = note.charAt(0);
+          const baseLetter = baseNote.charAt(0);
+          const originalPos = NOTE_ORDER.indexOf(originalLetter);
+          const basePos = NOTE_ORDER.indexOf(baseLetter);
+          
+          // If the enharmonic mapping crosses an octave boundary (e.g., B# -> C)
+          if (basePos < originalPos) {
+            displayOctave++;
+          } else if (basePos > originalPos) {
+            displayOctave--;
+          }
+        }
+        
+        const noteWithOctave = note + displayOctave;
         const delayMs = (startTime - ctx.currentTime + (index * noteInterval)) * 1000;
         // Pass the actual index - components can handle octave note specially if needed
         setTimeout(() => onNotePlay(index, noteWithOctave), Math.max(0, delayMs));
@@ -332,7 +350,24 @@ export function playScaleUpAndDown(
           displayIndex = (notes.length - 1) - descendingPosition; // notes.length=7, so 6, 5, 4, 3, 2, 1, 0
         }
         
-        const noteWithOctave = note + allOctaves[index];
+        // For enharmonic notes, adjust octave for display
+        let displayOctave = allOctaves[index];
+        if (ENHARMONIC_BASE_MAP[note]) {
+          const baseNote = ENHARMONIC_BASE_MAP[note];
+          const originalLetter = note.charAt(0);
+          const baseLetter = baseNote.charAt(0);
+          const originalPos = NOTE_ORDER.indexOf(originalLetter);
+          const basePos = NOTE_ORDER.indexOf(baseLetter);
+          
+          // If the enharmonic mapping crosses an octave boundary (e.g., B# -> C)
+          if (basePos < originalPos) {
+            displayOctave++;
+          } else if (basePos > originalPos) {
+            displayOctave--;
+          }
+        }
+        
+        const noteWithOctave = note + displayOctave;
         const delayMs = (startTime - ctx.currentTime + (index * noteInterval)) * 1000;
         setTimeout(() => onNotePlay(displayIndex, noteWithOctave), Math.max(0, delayMs));
       }
@@ -426,7 +461,24 @@ export function playScaleDescending(
       
       // Schedule animation callback with full note including octave
       if (onNotePlay) {
-        const noteWithOctave = note + octave;
+        // For enharmonic notes, adjust octave for display
+        let displayOctave = octave;
+        if (ENHARMONIC_BASE_MAP[note]) {
+          const baseNote = ENHARMONIC_BASE_MAP[note];
+          const originalLetter = note.charAt(0);
+          const baseLetter = baseNote.charAt(0);
+          const originalPos = NOTE_ORDER.indexOf(originalLetter);
+          const basePos = NOTE_ORDER.indexOf(baseLetter);
+          
+          // If the enharmonic mapping crosses an octave boundary (e.g., B# -> C)
+          if (basePos < originalPos) {
+            displayOctave++;
+          } else if (basePos > originalPos) {
+            displayOctave--;
+          }
+        }
+        
+        const noteWithOctave = note + displayOctave;
         const delayMs = (startTime - ctx.currentTime + (index * noteInterval)) * 1000;
         setTimeout(() => onNotePlay(index, noteWithOctave), Math.max(0, delayMs));
       }

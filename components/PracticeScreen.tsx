@@ -119,10 +119,26 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
         setActiveNote('');
       }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
-      playScale(displayNotes, 'medium', noteCallback);
+      // For melodic minor in descending mode, reverse the notes for playback
+      const isDescendingPlayback = isMelodicMinor && showDescending && scale.notesDescending;
+      const playbackNotes = isDescendingPlayback
+        ? [...scale.notesDescending].reverse()
+        : displayNotes;
+      
+      // Adjust the callback to map reversed indices back to display indices
+      const adjustedCallback = isDescendingPlayback 
+        ? (index: number, note: string) => {
+            // Reverse the index to match the display order
+            const displayIndex = index === -1 ? -1 : (displayNotes.length - 1 - index);
+            noteCallback(displayIndex, note);
+          }
+        : noteCallback;
+      
+      playScale(playbackNotes, 'medium', adjustedCallback);
       // Calculate duration: notes + octave note
       setTimeout(() => {
         setIsPlaying(false);
+        setIsPlayingDescending(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
       }, (displayNotes.length + 1) * 450 + 200);

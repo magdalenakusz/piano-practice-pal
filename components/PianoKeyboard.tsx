@@ -39,7 +39,12 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
       }
     }
     
-    // Reconstruct with octave if it exists
+    // Visualization surrogate: if an enharmonic adjustment pushed the note below visible range (octave < 4),
+    // clamp it to 4 so it can be highlighted without altering the actual audio pitch logic elsewhere.
+    if (adjustedOctave && parseInt(adjustedOctave) < 4) {
+      adjustedOctave = '4';
+    }
+    // Reconstruct with octave if it exists (post-clamp for UI only)
     return adjustedOctave ? normalized + adjustedOctave : normalized;
   };
 

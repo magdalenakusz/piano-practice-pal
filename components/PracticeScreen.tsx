@@ -119,22 +119,42 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
         setActiveNote('');
       }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
-      // For melodic minor in descending mode, reverse the notes for playback
+      // For melodic minor in descending mode, we need special handling
       const isDescendingPlayback = isMelodicMinor && showDescending && scale.notesDescending;
-      const playbackNotes = isDescendingPlayback
-        ? [...scale.notesDescending].reverse()
-        : displayNotes;
       
-      // Adjust the callback to map reversed indices back to display indices
-      const adjustedCallback = isDescendingPlayback 
-        ? (index: number, note: string) => {
-            // Reverse the index to match the display order
-            const displayIndex = index === -1 ? -1 : (displayNotes.length - 1 - index);
+      if (isDescendingPlayback) {
+        // For descending: Start from root at top, go down to root at bottom
+        // notesDescending is stored in ascending order, so reverse it
+        const reversedNotes = [...scale.notesDescending].reverse();
+        // Add the root note at the beginning (octave above)
+        const playbackNotes = [reversedNotes[reversedNotes.length - 1], ...reversedNotes];
+        
+        // Adjust callback to map indices correctly
+        // playbackNotes = [B_high, A, G, F#, E, D, C#, B_low]
+        // displayNotes = [B, C#, D, E, F#, G, A] (ascending order for display)
+        // When playing index 0 (B_high), we want to highlight displayIndex 0 (B)
+        // When playing index 1 (A), we want to highlight displayIndex 6 (A)
+        const adjustedCallback = (index: number, note: string) => {
+          if (index === -1) {
+            noteCallback(-1, note);
+          } else if (index === 0) {
+            // First note is octave root - highlight the root (index 0)
+            noteCallback(0, note);
+          } else {
+            // Map the descending playback to the ascending display
+            // index 1 (A) -> displayIndex 6 (A in display)
+            // index 2 (G) -> displayIndex 5 (G in display)
+            // index 7 (B_low) -> displayIndex 0 (B in display)
+            const displayIndex = displayNotes.length - index;
             noteCallback(displayIndex, note);
           }
-        : noteCallback;
+        };
+        
+        playScale(playbackNotes, 'medium', adjustedCallback);
+      } else {
+        playScale(displayNotes, 'medium', noteCallback);
+      }
       
-      playScale(playbackNotes, 'medium', adjustedCallback);
       // Calculate duration: notes + octave note
       setTimeout(() => {
         setIsPlaying(false);

@@ -371,4 +371,203 @@ describe('Audio Service - Octave Calculations', () => {
       expect(crossingScales.length).toBeGreaterThan(0);
     });
   });
+
+  describe('Melodic Minor Playback', () => {
+    describe('Scale data structure', () => {
+      it('should have notesDescending for all melodic minor scales', () => {
+        const melodicMinorScales = ALL_SCALES.filter(s => s.type === 'melodic-minor');
+        
+        expect(melodicMinorScales.length).toBe(12);
+        
+        melodicMinorScales.forEach(scale => {
+          expect(scale.notesDescending).toBeDefined();
+          expect(Array.isArray(scale.notesDescending)).toBe(true);
+          expect(scale.notesDescending!.length).toBe(7);
+        });
+      });
+
+      it('should have same root note in ascending and descending', () => {
+        const melodicMinorScales = ALL_SCALES.filter(s => s.type === 'melodic-minor');
+        
+        melodicMinorScales.forEach(scale => {
+          expect(scale.notes[0]).toBe(scale.notesDescending![0]);
+        });
+      });
+
+      it('should have different 6th and 7th degrees in ascending vs descending', () => {
+        const melodicMinorScales = ALL_SCALES.filter(s => s.type === 'melodic-minor');
+        
+        melodicMinorScales.forEach(scale => {
+          const asc6th = scale.notes[5]; // Index 5 = 6th degree
+          const asc7th = scale.notes[6]; // Index 6 = 7th degree
+          const desc6th = scale.notesDescending![5];
+          const desc7th = scale.notesDescending![6];
+          
+          // 6th and 7th should be different (raised in ascending, natural in descending)
+          expect(asc6th).not.toBe(desc6th);
+          expect(asc7th).not.toBe(desc7th);
+        });
+      });
+    });
+
+    describe('Up and down playback structure', () => {
+      it('should create correct ascending portion with octave', () => {
+        const bMelodicMinor = ALL_SCALES.find(s => s.name === 'B Melodic Minor')!;
+        const ascending = [...bMelodicMinor.notes, bMelodicMinor.notes[0]];
+        
+        expect(ascending).toEqual(['B', 'C#', 'D', 'E', 'F#', 'G#', 'A#', 'B']);
+        expect(ascending[6]).toBe('A#'); // Raised 7th in ascending
+      });
+
+      it('should create correct descending portion from notesDescending', () => {
+        const bMelodicMinor = ALL_SCALES.find(s => s.name === 'B Melodic Minor')!;
+        const descending = [...bMelodicMinor.notesDescending!, bMelodicMinor.notesDescending![0]]
+          .reverse()
+          .slice(1);
+        
+        expect(descending).toEqual(['A', 'G', 'F#', 'E', 'D', 'C#', 'B']);
+        expect(descending[0]).toBe('A'); // Natural 7th in descending
+        expect(descending[1]).toBe('G'); // Natural 6th in descending
+      });
+
+      it('should create full scale with ascending then descending', () => {
+        const bMelodicMinor = ALL_SCALES.find(s => s.name === 'B Melodic Minor')!;
+        const ascending = [...bMelodicMinor.notes, bMelodicMinor.notes[0]];
+        const descending = [...bMelodicMinor.notesDescending!, bMelodicMinor.notesDescending![0]]
+          .reverse()
+          .slice(1);
+        const fullScale = [...ascending, ...descending];
+        
+        expect(fullScale).toEqual([
+          'B', 'C#', 'D', 'E', 'F#', 'G#', 'A#', 'B', // Ascending with sharps
+          'A', 'G', 'F#', 'E', 'D', 'C#', 'B'          // Descending with naturals
+        ]);
+      });
+
+      it('should test all 12 melodic minor scales for correct structure', () => {
+        const melodicMinorScales = ALL_SCALES.filter(s => s.type === 'melodic-minor');
+        
+        melodicMinorScales.forEach(scale => {
+          const ascending = [...scale.notes, scale.notes[0]];
+          const descending = [...scale.notesDescending!, scale.notesDescending![0]]
+            .reverse()
+            .slice(1);
+          const fullScale = [...ascending, ...descending];
+          
+          // Should have 8 ascending + 7 descending = 15 total notes
+          expect(fullScale.length).toBe(15);
+          
+          // First note should be root (ascending start)
+          expect(fullScale[0]).toBe(scale.notes[0]);
+          
+          // Middle note should be root at octave (top of ascending)
+          expect(fullScale[7]).toBe(scale.notes[0]);
+          
+          // Last note should be root (end of descending)
+          expect(fullScale[14]).toBe(scale.notes[0]);
+          
+          // 6th degree should be different in ascending vs descending
+          const asc6th = fullScale[5]; // 6th note in ascending
+          const desc6th = fullScale[9]; // 6th note in descending (from top)
+          expect(asc6th).not.toBe(desc6th);
+        });
+      });
+    });
+
+    describe('Single descending playback', () => {
+      it('should reverse notesDescending for descending playback', () => {
+        const bMelodicMinor = ALL_SCALES.find(s => s.name === 'B Melodic Minor')!;
+        const playbackNotes = [...bMelodicMinor.notesDescending!].reverse();
+        
+        expect(playbackNotes).toEqual(['A', 'G', 'F#', 'E', 'D', 'C#', 'B']);
+        expect(playbackNotes[0]).toBe('A'); // Starts from top (7th degree)
+        expect(playbackNotes[playbackNotes.length - 1]).toBe('B'); // Ends at root
+      });
+
+      it('should use natural 6th and 7th in descending playback', () => {
+        const aMelodicMinor = ALL_SCALES.find(s => s.name === 'A Melodic Minor')!;
+        const playbackNotes = [...aMelodicMinor.notesDescending!].reverse();
+        
+        expect(playbackNotes[0]).toBe('G'); // Natural 7th (not G#)
+        expect(playbackNotes[1]).toBe('F'); // Natural 6th (not F#)
+      });
+
+      it('should test all 12 melodic minor scales for descending playback', () => {
+        const melodicMinorScales = ALL_SCALES.filter(s => s.type === 'melodic-minor');
+        
+        melodicMinorScales.forEach(scale => {
+          const playbackNotes = [...scale.notesDescending!].reverse();
+          
+          // Should have 7 notes
+          expect(playbackNotes.length).toBe(7);
+          
+          // Should start with the 7th degree (top note)
+          expect(playbackNotes[0]).toBe(scale.notesDescending![6]);
+          
+          // Should end with root
+          expect(playbackNotes[6]).toBe(scale.notes[0]);
+          
+          // 6th and 7th degrees should be natural (from notesDescending)
+          const desc7th = playbackNotes[0];
+          const desc6th = playbackNotes[1];
+          const asc7th = scale.notes[6];
+          const asc6th = scale.notes[5];
+          
+          // These should be different (natural vs raised)
+          expect(desc7th).not.toBe(asc7th);
+          expect(desc6th).not.toBe(asc6th);
+        });
+      });
+    });
+
+    describe('Specific melodic minor examples', () => {
+      it('A Melodic Minor: ascending has F# and G#', () => {
+        const aMelodicMinor = ALL_SCALES.find(s => s.name === 'A Melodic Minor')!;
+        
+        expect(aMelodicMinor.notes).toEqual(['A', 'B', 'C', 'D', 'E', 'F#', 'G#']);
+        expect(aMelodicMinor.notes[5]).toBe('F#'); // Raised 6th
+        expect(aMelodicMinor.notes[6]).toBe('G#'); // Raised 7th
+      });
+
+      it('A Melodic Minor: descending has F and G', () => {
+        const aMelodicMinor = ALL_SCALES.find(s => s.name === 'A Melodic Minor')!;
+        
+        expect(aMelodicMinor.notesDescending).toEqual(['A', 'B', 'C', 'D', 'E', 'F', 'G']);
+        expect(aMelodicMinor.notesDescending![5]).toBe('F'); // Natural 6th
+        expect(aMelodicMinor.notesDescending![6]).toBe('G'); // Natural 7th
+      });
+
+      it('B Melodic Minor: ascending has G# and A#', () => {
+        const bMelodicMinor = ALL_SCALES.find(s => s.name === 'B Melodic Minor')!;
+        
+        expect(bMelodicMinor.notes).toEqual(['B', 'C#', 'D', 'E', 'F#', 'G#', 'A#']);
+        expect(bMelodicMinor.notes[5]).toBe('G#'); // Raised 6th
+        expect(bMelodicMinor.notes[6]).toBe('A#'); // Raised 7th
+      });
+
+      it('B Melodic Minor: descending has G and A', () => {
+        const bMelodicMinor = ALL_SCALES.find(s => s.name === 'B Melodic Minor')!;
+        
+        expect(bMelodicMinor.notesDescending).toEqual(['B', 'C#', 'D', 'E', 'F#', 'G', 'A']);
+        expect(bMelodicMinor.notesDescending![5]).toBe('G'); // Natural 6th
+        expect(bMelodicMinor.notesDescending![6]).toBe('A'); // Natural 7th
+      });
+
+      it('D Melodic Minor: ascending has B and C#', () => {
+        const dMelodicMinor = ALL_SCALES.find(s => s.name === 'D Melodic Minor')!;
+        
+        expect(dMelodicMinor.notes).toEqual(['D', 'E', 'F', 'G', 'A', 'B', 'C#']);
+        expect(dMelodicMinor.notes[5]).toBe('B'); // Raised 6th
+        expect(dMelodicMinor.notes[6]).toBe('C#'); // Raised 7th
+      });
+
+      it('D Melodic Minor: descending has Bb and C', () => {
+        const dMelodicMinor = ALL_SCALES.find(s => s.name === 'D Melodic Minor')!;
+        
+        expect(dMelodicMinor.notesDescending).toEqual(['D', 'E', 'F', 'G', 'A', 'Bb', 'C']);
+        expect(dMelodicMinor.notesDescending![5]).toBe('Bb'); // Natural 6th
+        expect(dMelodicMinor.notesDescending![6]).toBe('C'); // Natural 7th
+      });
+    });
+  });
 });

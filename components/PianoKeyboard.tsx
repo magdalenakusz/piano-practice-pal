@@ -22,8 +22,25 @@ export const PianoKeyboard: React.FC<PianoKeyboardProps> = ({
     // Normalize the note name
     const normalized = noteEquivalents[noteName] || noteName;
     
+    // Adjust octave for enharmonic notes that cross octave boundaries
+    // B# -> C (next octave), Cb -> B (previous octave)
+    let adjustedOctave = octave;
+    if (octave && noteEquivalents[noteName]) {
+      const originalLetter = noteName.charAt(0);
+      const normalizedLetter = normalized.charAt(0);
+      
+      // B# becomes C - increment octave
+      if (originalLetter === 'B' && normalizedLetter === 'C') {
+        adjustedOctave = String(parseInt(octave) + 1);
+      }
+      // Cb becomes B - decrement octave  
+      else if (originalLetter === 'C' && normalizedLetter === 'B') {
+        adjustedOctave = String(parseInt(octave) - 1);
+      }
+    }
+    
     // Reconstruct with octave if it exists
-    return octave ? normalized + octave : normalized;
+    return adjustedOctave ? normalized + adjustedOctave : normalized;
   };
 
   const normalizedScaleNotes = useMemo(

@@ -373,8 +373,8 @@ export function playChord(notes: string[], duration: number = 1.5): void {
 /**
  * Play a scale in descending order with correct octave calculation
  * 
- * This function handles descending playback by reversing the note order
- * before octave calculation, ensuring the notes play in the correct octave range.
+ * This function handles descending playback by properly managing octave relationships.
+ * For melodic minor, the notes should already be in the descending form (natural 6th/7th).
  * 
  * @param notes - Array of note names in ascending order (will be reversed for playback)
  * @param tempo - Playback speed 
@@ -397,10 +397,18 @@ export function playScaleDescending(
     ctx.resume();
   }
   
-  // For descending: Start from octave, then go down to root
-  // Reverse the notes and add the octave root at the start
-  const reversedNotes = [...notes].reverse(); // ['A', 'G', 'F#', 'E', 'D', 'C#', 'B'] 
-  const descendingWithOctave = [notes[0], ...reversedNotes]; // ['B', 'A', 'G', 'F#', 'E', 'D', 'C#', 'B']
+  // For descending: We want to play root(high) -> ... -> root(low)
+  // First, add the octave note, then reverse the whole thing
+  const notesWithOctave = [...notes, notes[0]]; // ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'A']
+  
+  // Calculate octaves for the ascending sequence (this gives us correct octave progression)
+  const ascendingOctaves = calculateOctavesForScale(notesWithOctave);
+  // For A melodic: [4, 4, 5, 5, 5, 5, 5, 5] -> A4 B4 C5 D5 E5 F5 G5 A5
+  
+  // Now reverse both notes and octaves for descending playback
+  const descendingNotes = [...notesWithOctave].reverse(); // ['A', 'G', 'F', 'E', 'D', 'C', 'B', 'A']
+  const descendingOctaves = [...ascendingOctaves].reverse(); // [5, 5, 5, 5, 5, 5, 4, 4]
+  // This gives us: A5 G5 F5 E5 D5 C5 B4 A4 ✅
   
   // Slight overlap for smooth flow, but not too much
   const noteDuration = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.5 : 0.35;
@@ -408,18 +416,11 @@ export function playScaleDescending(
   
   const startTime = ctx.currentTime + 0.1; // Small delay to ensure smooth start
   
-  // Calculate octaves as if we're playing ascending, then we'll use reverse timing
-  // This ensures proper octave relationships
-  const ascendingForOctaves = [notes[0], ...notes]; // ['B', 'B', 'C#', 'D', 'E', 'F#', 'G', 'A']
-  const octaves = calculateOctavesForScale(ascendingForOctaves);
-  
-  // Now map the descending sequence to the correct octaves
-  descendingWithOctave.forEach((note, index) => {
-    // Map descending index to ascending octave
-    const octaveIndex = index === 0 ? 0 : descendingWithOctave.length - index;
-    const octave = octaves[octaveIndex] || 4;
-    
+  // Play each note with its correct octave
+  descendingNotes.forEach((note, index) => {
+    const octave = descendingOctaves[index];
     const frequency = getNoteFrequency(note, octave);
+    
     if (frequency) {
       playNote(frequency, noteDuration, startTime + (index * noteInterval));
       
@@ -434,7 +435,7 @@ export function playScaleDescending(
   
   // Schedule cleanup callback when all notes finish
   if (onNotePlay) {
-    const totalDuration = startTime - ctx.currentTime + (descendingWithOctave.length * noteInterval) + noteDuration;
+    const totalDuration = startTime - ctx.currentTime + (descendingNotes.length * noteInterval) + noteDuration;
     setTimeout(() => onNotePlay(-1, ''), Math.max(0, totalDuration * 1000));
   }
 }

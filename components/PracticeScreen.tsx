@@ -102,25 +102,31 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
     // Use the descending notes directly - playScaleDescending will handle the reversal and octaves
     const descendingNotes = scale.notesDescending;
     
-    // Create callback that maps descending audio indices to ascending display indices
+    // Create callback that maps descending audio indices to display indices
     const mappedCallback = (index: number, note: string) => {
       if (index === -1) {
         setActiveNoteIndex(-1);
         setActiveNote(note);
       } else {
         // playScaleDescending plays: B(high) -> A -> G -> F# -> E -> D -> C# -> B(low)
-        // We need to map this to the ascending display: [B, C#, D, E, F#, G, A]
+        // StaffNotation adds octave, so it displays: [B, C#, D, E, F#, G, A, B(octave)]
+        // Indices: 0, 1, 2, 3, 4, 5, 6, 7
         
         const totalNotes = descendingNotes.length + 1; // 8 notes including octave
         
-        if (index === 0 || index === totalNotes - 1) {
-          // First and last notes are both B (root) - highlight index 0
+        if (index === 0) {
+          // First audio note is B(high/octave) -> highlight index 7 (top of staff)
+          setActiveNoteIndex(totalNotes - 1);
+        } else if (index === totalNotes - 1) {
+          // Last audio note is B(low) -> highlight index 0 (bottom of staff)
           setActiveNoteIndex(0);
         } else {
-          // Map descending audio indices to ascending display indices
+          // Map descending audio indices to display indices
+          // Audio: B5(0) A5(1) G5(2) F#5(3) E5(4) D5(5) C#5(6) B4(7)
+          // Staff: B(0) C#(1) D(2)  E(3)   F#(4) G(5)  A(6)   B(7)
           // index 1 (A) -> display index 6 (A is at position 6)
-          // index 2 (G) -> display index 5 (G is at position 5) 
-          // index 6 (C#) -> display index 1 (C# is at position 1)
+          // index 2 (G) -> display index 5 (G is at position 5)
+          // index 3 (F#) -> display index 4 (F# is at position 4)
           const displayIndex = totalNotes - 1 - index;
           setActiveNoteIndex(displayIndex);
         }
@@ -132,8 +138,11 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   };
 
   const handlePlay = (mode: 'single' | 'upAndDown') => {
+    // Determine if we're playing in descending mode for single playback
+    const shouldPlayDescending = mode === 'single' && isMelodicMinor && showDescending && !!scale.notesDescending;
+    
     setIsPlaying(true);
-    setIsPlayingDescending(false);
+    setIsPlayingDescending(shouldPlayDescending); // Set to true if playing single descending
     
     const noteCallback = (index: number, note: string) => {
       setActiveNoteIndex(index);
@@ -157,9 +166,7 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
       }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
       // Single direction playback
-      const isDescendingMode = isMelodicMinor && showDescending && scale.notesDescending;
-      
-      if (isDescendingMode) {
+      if (shouldPlayDescending && scale.notesDescending) {
         const config = prepareDescendingPlayback();
         if (config) {
           playScaleDescending(config.playbackNotes, 'medium', config.mappedCallback);

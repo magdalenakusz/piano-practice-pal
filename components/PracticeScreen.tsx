@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { PianoKeyboard } from './PianoKeyboard';
 import StaffNotation from './StaffNotation';
 import { ALL_SCALES, getEnharmonicEquivalent } from '../constants/scales';
-import { playScale, playScaleUpAndDown } from '../services/audioService';
+import { playScale, playScaleUpAndDown, playScaleDescending } from '../services/audioService';
 import type { Scale, ConfidenceLevel } from '../types';
 import type { UsePracticeDataReturn } from '../hooks/usePracticeData';
 
@@ -92,46 +92,43 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
 
   /**
    * Prepare playback configuration for melodic minor descending mode
-   * For single descending, we want to start from the octave root and go down
+   * Uses the new playScaleDescending function for correct octave calculation
    */
   const prepareDescendingPlayback = () => {
     if (!scale.notesDescending) {
       return null;
     }
     
-    // For single descending playback, we want: B(high) -> A -> G -> F# -> E -> D -> C# -> B(low)
-    // Start with the root note (B) at octave, then play the descending notes in reverse order
-    const rootNote = scale.notesDescending[0]; // 'B'
-    const reversedDescending = [...scale.notesDescending].reverse(); // ['A', 'G', 'F#', 'E', 'D', 'C#', 'B']
-    const descendingFromOctave = [rootNote, ...reversedDescending.slice(0, -1)]; // ['B', 'A', 'G', 'F#', 'E', 'D', 'C#']
+    // Use the descending notes directly - playScaleDescending will handle the reversal and octaves
+    const descendingNotes = scale.notesDescending;
     
-    // playScale will add descendingFromOctave[0] (B) as octave
-    // So we get: ['B', 'A', 'G', 'F#', 'E', 'D', 'C#', 'B'] ✅
-    
-    // Create callback that maps descending indices to ascending display
+    // Create callback that maps descending audio indices to ascending display indices
     const mappedCallback = (index: number, note: string) => {
       if (index === -1) {
         setActiveNoteIndex(-1);
         setActiveNote(note);
-      } else if (index === 0 || index === 7) {
-        // First and last notes are both root B - highlight index 0 in display
-        setActiveNoteIndex(0);
-        setActiveNote(note);
       } else {
-        // Map descending playback indices to ascending display indices
-        // descendingFromOctave = ['B', 'A', 'G', 'F#', 'E', 'D', 'C#'] (7 notes)
-        // playScale adds octave -> ['B', 'A', 'G', 'F#', 'E', 'D', 'C#', 'B'] (8 notes)
-        // displayNotes = ['B', 'C#', 'D', 'E', 'F#', 'G', 'A'] (7 notes, ascending order)
-        // index 1 (A) -> displayIndex 6 (A)
-        // index 2 (G) -> displayIndex 5 (G)
-        // index 6 (C#) -> displayIndex 1 (C#)
-        const displayIndex = displayNotes.length - index;
-        setActiveNoteIndex(displayIndex);
+        // playScaleDescending plays: B(high) -> A -> G -> F# -> E -> D -> C# -> B(low)
+        // We need to map this to the ascending display: [B, C#, D, E, F#, G, A]
+        
+        const totalNotes = descendingNotes.length + 1; // 8 notes including octave
+        
+        if (index === 0 || index === totalNotes - 1) {
+          // First and last notes are both B (root) - highlight index 0
+          setActiveNoteIndex(0);
+        } else {
+          // Map descending audio indices to ascending display indices
+          // index 1 (A) -> display index 6 (A is at position 6)
+          // index 2 (G) -> display index 5 (G is at position 5) 
+          // index 6 (C#) -> display index 1 (C# is at position 1)
+          const displayIndex = totalNotes - 1 - index;
+          setActiveNoteIndex(displayIndex);
+        }
         setActiveNote(note);
       }
     };
     
-    return { playbackNotes: descendingFromOctave, mappedCallback };
+    return { playbackNotes: descendingNotes, mappedCallback };
   };
 
   const handlePlay = (mode: 'single' | 'upAndDown') => {
@@ -165,7 +162,7 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
       if (isDescendingMode) {
         const config = prepareDescendingPlayback();
         if (config) {
-          playScale(config.playbackNotes, 'medium', config.mappedCallback);
+          playScaleDescending(config.playbackNotes, 'medium', config.mappedCallback);
         }
       } else {
         playScale(displayNotes, 'medium', noteCallback);

@@ -370,6 +370,75 @@ export function playChord(notes: string[], duration: number = 1.5): void {
   });
 }
 
+/**
+ * Play a scale in descending order with correct octave calculation
+ * 
+ * This function handles descending playback by reversing the note order
+ * before octave calculation, ensuring the notes play in the correct octave range.
+ * 
+ * @param notes - Array of note names in ascending order (will be reversed for playback)
+ * @param tempo - Playback speed 
+ * @param onNotePlay - Optional callback fired when each note starts playing (noteIndex, note)
+ */
+export function playScaleDescending(
+  notes: string[], 
+  tempo: 'slow' | 'medium' | 'fast' = 'medium',
+  onNotePlay?: (noteIndex: number, note: string) => void
+): void {
+  const ctx = getAudioContext();
+  
+  // Initialize audio if not already done (important for iOS PWA)
+  if (!isAudioInitialized) {
+    initializeAudio();
+  }
+  
+  // Resume audio context if it's suspended (required by browser autoplay policies)
+  if (ctx.state === 'suspended') {
+    ctx.resume();
+  }
+  
+  // For descending: Start from octave, then go down to root
+  // Reverse the notes and add the octave root at the start
+  const reversedNotes = [...notes].reverse(); // ['A', 'G', 'F#', 'E', 'D', 'C#', 'B'] 
+  const descendingWithOctave = [notes[0], ...reversedNotes]; // ['B', 'A', 'G', 'F#', 'E', 'D', 'C#', 'B']
+  
+  // Slight overlap for smooth flow, but not too much
+  const noteDuration = tempo === 'slow' ? 0.65 : tempo === 'medium' ? 0.5 : 0.35;
+  const noteInterval = tempo === 'slow' ? 0.6 : tempo === 'medium' ? 0.45 : 0.3;
+  
+  const startTime = ctx.currentTime + 0.1; // Small delay to ensure smooth start
+  
+  // Calculate octaves as if we're playing ascending, then we'll use reverse timing
+  // This ensures proper octave relationships
+  const ascendingForOctaves = [notes[0], ...notes]; // ['B', 'B', 'C#', 'D', 'E', 'F#', 'G', 'A']
+  const octaves = calculateOctavesForScale(ascendingForOctaves);
+  
+  // Now map the descending sequence to the correct octaves
+  descendingWithOctave.forEach((note, index) => {
+    // Map descending index to ascending octave
+    const octaveIndex = index === 0 ? 0 : descendingWithOctave.length - index;
+    const octave = octaves[octaveIndex] || 4;
+    
+    const frequency = getNoteFrequency(note, octave);
+    if (frequency) {
+      playNote(frequency, noteDuration, startTime + (index * noteInterval));
+      
+      // Schedule animation callback with full note including octave
+      if (onNotePlay) {
+        const noteWithOctave = note + octave;
+        const delayMs = (startTime - ctx.currentTime + (index * noteInterval)) * 1000;
+        setTimeout(() => onNotePlay(index, noteWithOctave), Math.max(0, delayMs));
+      }
+    }
+  });
+  
+  // Schedule cleanup callback when all notes finish
+  if (onNotePlay) {
+    const totalDuration = startTime - ctx.currentTime + (descendingWithOctave.length * noteInterval) + noteDuration;
+    setTimeout(() => onNotePlay(-1, ''), Math.max(0, totalDuration * 1000));
+  }
+}
+
 // Stop all currently playing audio
 export function stopAudio(): void {
   if (audioContext) {

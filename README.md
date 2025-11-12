@@ -186,7 +186,7 @@ All tests validate music theory accuracy, core functionality, and UI components 
 - **Vite 6** - Fast build tool and dev server
 - **VexFlow 5** - Professional music notation rendering (SVG)
 - **Web Audio API** - Real-time audio synthesis for scale playback
-- **Vitest 3** - Fast unit testing framework with 388 tests
+- **Vitest 3** - Fast unit testing framework with 790 tests
 - **Tailwind CSS** - Utility-first styling (via CDN)
 - **LocalStorage** - Client-side data persistence
 
@@ -210,7 +210,7 @@ piano-practice-pal/
 │   ├── audioService.ts     # Web Audio API for scale playback
 │   ├── practiceService.ts  # Scale selection algorithm
 │   └── storageService.ts   # LocalStorage utilities
-├── tests/              # Test suite (388 tests)
+├── tests/              # Test suite (790 tests)
 │   ├── setup.ts            # Vitest configuration
 │   ├── scales.test.ts      # Scale interval tests (248 tests)
 │   ├── keySignatures.test.ts  # Key signature tests (56 tests)
@@ -283,3 +283,39 @@ Remember: Consistent daily practice is the key to mastering scales. Even just 10
 ---
 
 Built with ❤️ for pianists everywhere
+
+## ♭♯ Enharmonic Visualization & Pitch Integrity
+
+Some scales (e.g. **Ab Natural Minor**, **Eb Harmonic Minor**) include notes like `Cb` and `Fb`. These present two intertwined challenges:
+
+1. **Music Theory Correctness**: Each diatonic letter A–G must appear exactly once in a scale spelling (so `Cb` is correct — not replaced by `B`).
+2. **UI Keyboard Range**: The on‑screen keyboard displays keys from **C4 → B5**. Normalizing `Cb4` to its enharmonic `B` shifts it to `B3`, which is outside the visible range — causing missing highlights.
+
+### Solution Architecture
+
+| Layer | Responsibility | Strategy |
+|-------|----------------|----------|
+| Scale Data | Preserve theoretical spelling | Keep `Cb`, `Fb`, `B#`, `E#`, double sharps/flats untouched |
+| Octave Calculation | Prevent premature octave jumps | Map base letters (e.g. `Cb → B`) ONLY for boundary comparison (no pitch bump) |
+| Audio Synthesis | Accurate pitch | Use original note name; frequency table maps enharmonics to same Hz in given octave |
+| Keyboard Visualization | Keep highlight visible | UI-only clamp: if normalization produces an octave < 4 (e.g. `B3` from `Cb4`), visually render it at octave 4 without altering audio |
+
+### Key Guarantees
+
+- No artificial pitch shift: `Cb4` plays with the same frequency as `B4` (not `B5`).
+- Visual highlight always appears within the displayed keyboard span.
+- Enharmonic detection doesn't mutate scale arrays — pure comparison using a base-note map.
+- Regression tests enforce: frequency equivalence (`Cb` vs `B`) and absence of octave bump at enharmonic boundaries.
+
+### Relevant Tests (Edge Cases)
+
+- `enharmonic-audio-regression.test.ts` — Validates octave progression and frequency parity.
+- `visual-surrogate-highlight.test.tsx` — Ensures `Cb4` produces a highlight (surrogate `B4`) without pitch alteration.
+
+### Why Not Extend the Keyboard Range?
+
+Extending downward to display `B3` would introduce asymmetry (showing part of octave 3 only for rare cases) and reduce visual focus. The surrogate clamp keeps the interface consistent while honoring theory and sound.
+
+If you introduce custom ranges later (e.g. full 88-key view), remove the clamp logic in `PianoKeyboard.tsx` and update tests accordingly.
+
+---

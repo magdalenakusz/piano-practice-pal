@@ -68,7 +68,8 @@ function getNoteBase(noteName: string): string {
   return noteName.charAt(0);
 }
 
-function getNoteFrequency(noteName: string, octave: number = 4): number {
+// Exported for testing edge-case frequency equivalence (Cb vs B, etc.)
+export function getNoteFrequency(noteName: string, octave: number = 4): number {
   const baseFreq = BASE_NOTE_FREQUENCIES[noteName];
   if (!baseFreq) return 440; // Default to A4 if not found
   
@@ -77,7 +78,8 @@ function getNoteFrequency(noteName: string, octave: number = 4): number {
   return baseFreq * Math.pow(2, octaveDiff);
 }
 
-function calculateOctavesForScale(notes: string[]): number[] {
+// Exported for regression tests (octave progression without artificial bumps)
+export function calculateOctavesForScale(notes: string[]): number[] {
   if (notes.length === 0) return [];
   
   // ALWAYS start at octave 4 to match the visible keyboard range (C4-B5)

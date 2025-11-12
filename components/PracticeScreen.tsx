@@ -92,44 +92,46 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
 
   /**
    * Prepare playback configuration for melodic minor descending mode
-   * Uses the same logic as playScaleUpAndDown for consistency
+   * For single descending, we want to start from the octave root and go down
    */
   const prepareDescendingPlayback = () => {
     if (!scale.notesDescending) {
       return null;
     }
     
-    // Use the EXACT same logic as playScaleUpAndDown for descending portion
-    // Add octave, reverse, and remove duplicate root
-    const descendingNotes = [...scale.notesDescending, scale.notesDescending[0]].reverse().slice(1);
-    // This gives us: [A, G, F#, E, D, C#, B] for B melodic minor (7 notes, ready to play)
+    // For single descending playback, we want: B(high) -> A -> G -> F# -> E -> D -> C# -> B(low)
+    // Start with the root note (B) at octave, then play the descending notes in reverse order
+    const rootNote = scale.notesDescending[0]; // 'B'
+    const reversedDescending = [...scale.notesDescending].reverse(); // ['A', 'G', 'F#', 'E', 'D', 'C#', 'B']
+    const descendingFromOctave = [rootNote, ...reversedDescending.slice(0, -1)]; // ['B', 'A', 'G', 'F#', 'E', 'D', 'C#']
+    
+    // playScale will add descendingFromOctave[0] (B) as octave
+    // So we get: ['B', 'A', 'G', 'F#', 'E', 'D', 'C#', 'B'] ✅
     
     // Create callback that maps descending indices to ascending display
     const mappedCallback = (index: number, note: string) => {
       if (index === -1) {
         setActiveNoteIndex(-1);
         setActiveNote(note);
+      } else if (index === 0 || index === 7) {
+        // First and last notes are both root B - highlight index 0 in display
+        setActiveNoteIndex(0);
+        setActiveNote(note);
       } else {
         // Map descending playback indices to ascending display indices
-        // descendingNotes = [A, G, F#, E, D, C#, B] (7 notes from playScaleUpAndDown logic)
-        // playScale adds octave at end -> [A, G, F#, E, D, C#, B, A] (8 notes)
-        // displayNotes = [B, C#, D, E, F#, G, A] (7 notes, ascending order)
-        // index 0 (A) -> displayIndex 6 (A)
-        // index 1 (G) -> displayIndex 5 (G)
-        // index 6 (B) -> displayIndex 0 (B)
-        // index 7 (A octave) -> displayIndex 6 (A)
-        if (index >= displayNotes.length) {
-          // Octave note (index 7 is A octave)
-          setActiveNoteIndex(displayNotes.length - 1);
-        } else {
-          const displayIndex = displayNotes.length - 1 - index;
-          setActiveNoteIndex(displayIndex);
-        }
+        // descendingFromOctave = ['B', 'A', 'G', 'F#', 'E', 'D', 'C#'] (7 notes)
+        // playScale adds octave -> ['B', 'A', 'G', 'F#', 'E', 'D', 'C#', 'B'] (8 notes)
+        // displayNotes = ['B', 'C#', 'D', 'E', 'F#', 'G', 'A'] (7 notes, ascending order)
+        // index 1 (A) -> displayIndex 6 (A)
+        // index 2 (G) -> displayIndex 5 (G)
+        // index 6 (C#) -> displayIndex 1 (C#)
+        const displayIndex = displayNotes.length - index;
+        setActiveNoteIndex(displayIndex);
         setActiveNote(note);
       }
     };
     
-    return { playbackNotes: descendingNotes, mappedCallback };
+    return { playbackNotes: descendingFromOctave, mappedCallback };
   };
 
   const handlePlay = (mode: 'single' | 'upAndDown') => {

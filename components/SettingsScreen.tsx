@@ -61,10 +61,10 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
                 {SCALE_TYPE_LABELS[scaleType]}
               </p>
               <p className="text-sm text-gray-400">
-                {scaleType === 'major' && '15 scales (C, G, D, A, E, B, F#, C#, F, Bb, Eb, Ab, Db, Gb, Cb)'}
-                {scaleType === 'natural-minor' && '20 scales (All natural minor keys)'}
-                {scaleType === 'harmonic-minor' && '20 scales (Natural minor with raised 7th)'}
-                {scaleType === 'melodic-minor' && '20 scales (Raised 6th & 7th ascending)'}
+                {scaleType === 'major' && '12 scales (C, G, D, A, E, B, F#, C#, F, Bb, Eb, Ab)'}
+                {scaleType === 'natural-minor' && '12 scales (A, E, B, F#, C#, D, G, C, F, Bb, Eb, Ab)'}
+                {scaleType === 'harmonic-minor' && '12 scales (Natural minor with raised 7th)'}
+                {scaleType === 'melodic-minor' && '12 scales (Raised 6th & 7th ascending)'}
               </p>
             </div>
             <button

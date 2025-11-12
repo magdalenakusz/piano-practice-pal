@@ -80,6 +80,17 @@ To preview the production build locally:
 npm run preview
 ```
 
+### Deploy to GitHub Pages
+
+To deploy the app to GitHub Pages:
+
+```bash
+npm run deploy
+```
+
+This command builds the production bundle and publishes it to GitHub Pages. The app will be available at:
+**https://magdalenakusz.github.io/piano-practice-pal/**
+
 ### Run Tests
 
 To run the comprehensive test suite (525 tests):

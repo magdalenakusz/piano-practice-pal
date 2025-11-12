@@ -1,5 +1,7 @@
 # 🎹 Piano Practice Pal
 
+[![CI](https://github.com/magdalenakusz/piano-practice-pal/actions/workflows/ci.yml/badge.svg)](https://github.com/magdalenakusz/piano-practice-pal/actions/workflows/ci.yml)
+
 A clean, simple web app designed to help you master all piano scales through daily practice and spaced repetition. Perfect for pianists of all levels who want to build consistent practice habits.
 
 ## ✨ Features
@@ -18,7 +20,7 @@ A clean, simple web app designed to help you master all piano scales through dai
 - **Proper Music Notation**: Uses correct theoretical notation with proper note spelling
 - **Mobile-Friendly**: Fully responsive design works on all devices and screen sizes
 - **Offline-Ready**: All data stored locally in your browser - no account required
-- **Comprehensive Test Suite**: 525 unit tests ensure all scales are musically correct
+- **Comprehensive Test Suite**: 579 tests with 42% code coverage ensure quality and correctness
 
 ## 🎯 Scale Coverage
 
@@ -93,7 +95,7 @@ This command builds the production bundle and publishes it to GitHub Pages. The 
 
 ### Run Tests
 
-To run the comprehensive test suite (525 tests):
+To run the comprehensive test suite (579 tests):
 
 ```bash
 # Run all tests in watch mode
@@ -115,13 +117,16 @@ npm test -- scales.test.ts
 npm test -- --reporter=verbose
 ```
 
-The test suite includes 4 test files with 525 total tests:
-- **audioService.test.ts** (137 tests): Octave calculations for all 48 scales (major, natural minor, harmonic minor, melodic minor)
-- **scales.test.ts** (248 tests): Scale intervals and note spelling
-- **keySignatures.test.ts** (56 tests): Key signature mapping
-- **enharmonic.test.ts** (84 tests): Enharmonic equivalent conversions
+The test suite includes 8 test files with 579 total tests:
+- **audioService.test.ts** (347 tests): Audio synthesis, octave calculations, and scale playback (137 octave tests covering all 48 scales)
+- **scaleDetection.test.ts** (174 tests): Scale detection algorithm validation
+- **storageService.test.ts** (28 tests): localStorage operations, data management, and error handling
+- **practiceService.test.ts** (13 tests): Scale selection algorithm, confidence-based prioritization, and enharmonic duplicate prevention
+- **PianoKeyboard.test.tsx** (10 tests): PianoKeyboard component rendering with various scale inputs
+- **settings.test.ts** (4 tests): User settings management
+- **App.test.tsx** (3 tests): App component rendering
 
-All tests validate music theory accuracy, including proper octave handling for enharmonic notes (B#, Cb, E#, Fb).
+All tests validate music theory accuracy, core functionality, and UI components with **42.06% code coverage**.
 
 ## 📱 How to Use
 

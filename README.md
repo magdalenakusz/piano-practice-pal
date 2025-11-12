@@ -18,7 +18,7 @@ A clean, simple web app designed to help you master all piano scales through dai
 - **Proper Music Notation**: Uses correct theoretical notation with proper note spelling
 - **Mobile-Friendly**: Fully responsive design works on all devices and screen sizes
 - **Offline-Ready**: All data stored locally in your browser - no account required
-- **Comprehensive Test Suite**: 388 unit tests ensure all scales are musically correct
+- **Comprehensive Test Suite**: 525 unit tests ensure all scales are musically correct
 
 ## 🎯 Scale Coverage
 
@@ -82,10 +82,10 @@ npm run preview
 
 ### Run Tests
 
-To run the comprehensive test suite (388 tests):
+To run the comprehensive test suite (525 tests):
 
 ```bash
-# Run tests in watch mode
+# Run all tests in watch mode
 npm test
 
 # Run tests once
@@ -96,12 +96,21 @@ npm run test:ui
 
 # Run tests with coverage report
 npm run test:coverage
+
+# Run specific test file
+npm test -- scales.test.ts
+
+# Run tests with verbose output
+npm test -- --reporter=verbose
 ```
 
-The test suite includes:
-- **248 tests** for scale intervals and note spelling
-- **56 tests** for key signature mapping
-- **84 tests** for enharmonic equivalent conversions
+The test suite includes 4 test files with 525 total tests:
+- **audioService.test.ts** (137 tests): Octave calculations for all 48 scales (major, natural minor, harmonic minor, melodic minor)
+- **scales.test.ts** (248 tests): Scale intervals and note spelling
+- **keySignatures.test.ts** (56 tests): Key signature mapping
+- **enharmonic.test.ts** (84 tests): Enharmonic equivalent conversions
+
+All tests validate music theory accuracy, including proper octave handling for enharmonic notes (B#, Cb, E#, Fb).
 
 ## 📱 How to Use
 

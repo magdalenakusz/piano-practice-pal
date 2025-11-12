@@ -102,19 +102,10 @@ function calculateOctavesForScale(notes: string[]): number[] {
       currentOctave++;
     }
     
-    // Adjust octave for enharmonic equivalents that cross octave boundaries
-    // B# is actually C of the next octave, E# is actually F of the same octave
-    // Cb is actually B of the previous octave, Fb is actually E of the same octave
-    let adjustedOctave = currentOctave;
-    if (note === 'B#' || note === 'B##') {
-      // B# is C of the next octave
-      adjustedOctave = currentOctave + 1;
-    } else if (note === 'Cb') {
-      // Cb is B of the previous octave
-      adjustedOctave = currentOctave - 1;
-    }
-    
-    octaves.push(adjustedOctave);
+    // All notes in a scale should stay within the same octave span
+    // No additional octave adjustments needed - the note letter progression
+    // handles octave changes correctly
+    octaves.push(currentOctave);
     previousLetter = currentLetter;
   }
   

@@ -77,6 +77,7 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   const [isPlayingDescending, setIsPlayingDescending] = useState(false);
 
   const isMelodicMinor = scale.type === 'melodic-minor';
+  
   // During playback, switch display based on which direction is playing
   // When not playing, use the showDescending prop from the toggle button
   const effectiveShowDescending = isPlaying ? isPlayingDescending : showDescending;
@@ -89,29 +90,62 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
     ? equivalent.notesDescending
     : equivalent?.notes;
 
-    const handlePlay = (mode: 'single' | 'upAndDown') => {
+  /**
+   * Prepare playback configuration for melodic minor descending mode
+   * Returns the notes to play and a callback that maps playback indices to display indices
+   */
+  const prepareDescendingPlayback = () => {
+    if (!scale.notesDescending) {
+      return null;
+    }
+    
+    // Reverse the descending notes (stored in ascending order)
+    const reversedNotes = [...scale.notesDescending].reverse();
+    // Add root note at the beginning (octave above) since playScale adds notes[0] as octave
+    const playbackNotes = [reversedNotes[reversedNotes.length - 1], ...reversedNotes];
+    
+    // Create callback that maps playback indices to display indices
+    const mappedCallback = (index: number, note: string) => {
+      if (index === -1) {
+        setActiveNoteIndex(-1);
+        setActiveNote(note);
+      } else if (index === 0) {
+        // First note is octave root - highlight the root (index 0 in display)
+        setActiveNoteIndex(0);
+        setActiveNote(note);
+      } else {
+        // Map descending playback to ascending display
+        // displayNotes = [B, C#, D, E, F#, G, A] (7 notes)
+        // playbackNotes = [B, A, G, F#, E, D, C#, B] (8 notes with octave)
+        // index 1 (A) -> displayIndex 6 (A)
+        // index 7 (B) -> displayIndex 0 (B)
+        const displayIndex = displayNotes.length - index;
+        setActiveNoteIndex(displayIndex);
+        setActiveNote(note);
+      }
+    };
+    
+    return { playbackNotes, mappedCallback };
+  };
+
+  const handlePlay = (mode: 'single' | 'upAndDown') => {
     setIsPlaying(true);
-    setIsPlayingDescending(false); // Always start with ascending
+    setIsPlayingDescending(false);
     
     const noteCallback = (index: number, note: string) => {
       setActiveNoteIndex(index);
       setActiveNote(note);
     };
     
+    const duration = (scale.notes.length + 1) * 450 + 200;
+    
     if (mode === 'upAndDown') {
-      // For melodic minor, pass the descending notes (natural minor form)
-      const descendingNotes = isMelodicMinor && scale.notesDescending 
-        ? scale.notesDescending 
-        : undefined;
-      
-      // Callback to switch UI when descending starts
-      const directionCallback = isMelodicMinor ? (isDesc: boolean) => {
-        setIsPlayingDescending(isDesc);
-      } : undefined;
+      // Up and down playback
+      const descendingNotes = isMelodicMinor && scale.notesDescending ? scale.notesDescending : undefined;
+      const directionCallback = isMelodicMinor ? (isDesc: boolean) => setIsPlayingDescending(isDesc) : undefined;
       
       playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes, directionCallback);
-      // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
-      // (notes.length + 1) * 2 - 1 = notes.length * 2 + 1
+      
       setTimeout(() => {
         setIsPlaying(false);
         setIsPlayingDescending(false);
@@ -119,49 +153,24 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
         setActiveNote('');
       }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
-      // For melodic minor in descending mode, we need special handling
-      const isDescendingPlayback = isMelodicMinor && showDescending && scale.notesDescending;
+      // Single direction playback
+      const isDescendingMode = isMelodicMinor && showDescending && scale.notesDescending;
       
-      if (isDescendingPlayback) {
-        // For descending: Start from root at top, go down to root at bottom
-        // notesDescending is stored in ascending order, so reverse it
-        const reversedNotes = [...scale.notesDescending].reverse();
-        // Add the root note at the beginning (octave above)
-        const playbackNotes = [reversedNotes[reversedNotes.length - 1], ...reversedNotes];
-        
-        // Adjust callback to map indices correctly
-        // playbackNotes = [B_high, A, G, F#, E, D, C#, B_low]
-        // displayNotes = [B, C#, D, E, F#, G, A] (ascending order for display)
-        // When playing index 0 (B_high), we want to highlight displayIndex 0 (B)
-        // When playing index 1 (A), we want to highlight displayIndex 6 (A)
-        const adjustedCallback = (index: number, note: string) => {
-          if (index === -1) {
-            noteCallback(-1, note);
-          } else if (index === 0) {
-            // First note is octave root - highlight the root (index 0)
-            noteCallback(0, note);
-          } else {
-            // Map the descending playback to the ascending display
-            // index 1 (A) -> displayIndex 6 (A in display)
-            // index 2 (G) -> displayIndex 5 (G in display)
-            // index 7 (B_low) -> displayIndex 0 (B in display)
-            const displayIndex = displayNotes.length - index;
-            noteCallback(displayIndex, note);
-          }
-        };
-        
-        playScale(playbackNotes, 'medium', adjustedCallback);
+      if (isDescendingMode) {
+        const config = prepareDescendingPlayback();
+        if (config) {
+          playScale(config.playbackNotes, 'medium', config.mappedCallback);
+        }
       } else {
         playScale(displayNotes, 'medium', noteCallback);
       }
       
-      // Calculate duration: notes + octave note
       setTimeout(() => {
         setIsPlaying(false);
         setIsPlayingDescending(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
-      }, (displayNotes.length + 1) * 450 + 200);
+      }, duration);
     }
   };
 

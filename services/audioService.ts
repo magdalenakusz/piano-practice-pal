@@ -243,6 +243,20 @@ export function playScale(
 /**
  * Play a scale up and down with optional animation callback
  */
+/**
+ * Play a scale up and down (ascending then descending) with optional animation callback.
+ * 
+ * For melodic minor scales:
+ * - Ascending uses raised 6th and 7th degrees (from `notes`)
+ * - Descending uses natural 6th and 7th degrees (from `notesDescending`)
+ * - UI can be notified when direction changes via `onDirectionChange`
+ * 
+ * @param notes - The ascending scale notes (7 notes, no octave)
+ * @param tempo - Playback speed
+ * @param onNotePlay - Callback when each note plays (receives index and note with octave)
+ * @param notesDescending - Optional descending notes for melodic minor (7 notes, in ascending order)
+ * @param onDirectionChange - Optional callback when switching from ascending to descending
+ */
 export function playScaleUpAndDown(
   notes: string[], 
   tempo: 'slow' | 'medium' | 'fast' = 'medium',
@@ -250,13 +264,16 @@ export function playScaleUpAndDown(
   notesDescending?: string[],
   onDirectionChange?: (isDescending: boolean) => void
 ): void {
-  // Add octave note at the end of ascending
+  // Ascending: Add octave note at the end (e.g., C-D-E-F-G-A-B-C)
   const ascending = [...notes, notes[0]];
-  // Descending: from the octave down to (but not including) the root
-  // For melodic minor, notesDescending is in ascending order, so add octave, reverse, and skip root
+  
+  // Descending: Reverse and remove duplicate root
+  // For melodic minor, notesDescending is stored in ascending order,
+  // so we reverse it to play from high to low
   const descending = notesDescending 
-    ? [...notesDescending, notesDescending[0]].reverse().slice(1)
-    : [...notes, notes[0]].reverse().slice(1);
+    ? [...notesDescending, notesDescending[0]].reverse().slice(1)  // Melodic minor: natural 6th/7th
+    : [...notes, notes[0]].reverse().slice(1);                      // Other scales: same notes reversed
+    
   const fullScale = [...ascending, ...descending];
   
   // Calculate octaves for the full scale (up and down)

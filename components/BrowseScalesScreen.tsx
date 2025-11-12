@@ -21,26 +21,23 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
 
   const handlePlayScale = (scale: Scale, direction: 'ascending' | 'up-and-down') => {
     setIsPlaying(true);
-    setIsPlayingDescending(false); // Always start with ascending
+    setIsPlayingDescending(false);
     
     const noteCallback = (index: number, note: string) => {
       setActiveNoteIndex(index);
       setActiveNote(note);
     };
     
+    const duration = (scale.notes.length + 1) * 450 + 200;
+    
     if (direction === 'up-and-down') {
-      // For melodic minor, pass the descending notes (natural minor form)
-      const descendingNotes = scale.type === 'melodic-minor' && scale.notesDescending 
-        ? scale.notesDescending 
-        : undefined;
-      
-      // Callback to switch UI when descending starts
-      const directionCallback = scale.type === 'melodic-minor' ? (isDesc: boolean) => {
-        setIsPlayingDescending(isDesc);
-      } : undefined;
+      // Up and down playback with melodic minor support
+      const isMelodicMinor = scale.type === 'melodic-minor';
+      const descendingNotes = isMelodicMinor && scale.notesDescending ? scale.notesDescending : undefined;
+      const directionCallback = isMelodicMinor ? (isDesc: boolean) => setIsPlayingDescending(isDesc) : undefined;
       
       playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes, directionCallback);
-      // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
+      
       setTimeout(() => {
         setIsPlaying(false);
         setIsPlayingDescending(false);
@@ -48,14 +45,15 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
         setActiveNote('');
       }, (scale.notes.length * 2 + 1) * 450 + 200);
     } else {
+      // Single ascending playback
       playScale(scale.notes, 'medium', noteCallback);
-      // Calculate duration: notes + octave note
+      
       setTimeout(() => {
         setIsPlaying(false);
         setIsPlayingDescending(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
-      }, (scale.notes.length + 1) * 450 + 200);
+      }, duration);
     }
   };
 

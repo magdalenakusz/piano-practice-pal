@@ -4,6 +4,11 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  define: {
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+    __GIT_COMMIT__: JSON.stringify(process.env.VITE_GIT_COMMIT || 'dev'),
+    __GIT_BRANCH__: JSON.stringify(process.env.VITE_GIT_BRANCH || 'local'),
+  },
   plugins: [
     react(),
     VitePWA({

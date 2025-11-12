@@ -5,8 +5,9 @@ interface AboutScreenProps {
 }
 
 export const AboutScreen: React.FC<AboutScreenProps> = ({ onClose }) => {
-  const version = '2.1.0';
-  const lastUpdated = 'November 3, 2025';
+  const buildTime = new Date(__BUILD_TIME__).toLocaleString();
+  const gitCommit = __GIT_COMMIT__.substring(0, 7);
+  const gitBranch = __GIT_BRANCH__;
 
   return (
     <>
@@ -14,7 +15,10 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ onClose }) => {
         {/* Header */}
         <div className="text-center">
           <h2 className="text-3xl font-bold text-white mb-2">About</h2>
-          <p className="text-gray-400">Piano Practice Pal v{version}</p>
+          <p className="text-gray-400">Piano Practice Pal</p>
+          <p className="text-xs text-gray-500 mt-1">
+            {gitBranch}@{gitCommit} · {buildTime}
+          </p>
         </div>
 
         {/* Description */}
@@ -147,10 +151,10 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ onClose }) => {
               <span className="font-semibold text-white">Created by:</span> Magdalena
             </p>
             <p>
-              <span className="font-semibold text-white">Last Updated:</span> {lastUpdated}
+              <span className="font-semibold text-white">Build:</span> {buildTime}
             </p>
             <p>
-              <span className="font-semibold text-white">Version:</span> {version}
+              <span className="font-semibold text-white">Commit:</span> {gitCommit} ({gitBranch})
             </p>
             <div className="pt-2 space-y-1">
               <a

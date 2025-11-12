@@ -17,9 +17,11 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
   const [activeNote, setActiveNote] = useState('');
+  const [isPlayingDescending, setIsPlayingDescending] = useState(false);
 
   const handlePlayScale = (scale: Scale, direction: 'ascending' | 'up-and-down') => {
     setIsPlaying(true);
+    setIsPlayingDescending(false); // Always start with ascending
     
     const noteCallback = (index: number, note: string) => {
       setActiveNoteIndex(index);
@@ -31,10 +33,17 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
       const descendingNotes = scale.type === 'melodic-minor' && scale.notesDescending 
         ? scale.notesDescending 
         : undefined;
-      playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes);
+      
+      // Callback to switch UI when descending starts
+      const directionCallback = scale.type === 'melodic-minor' ? (isDesc: boolean) => {
+        setIsPlayingDescending(isDesc);
+      } : undefined;
+      
+      playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes, directionCallback);
       // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
       setTimeout(() => {
         setIsPlaying(false);
+        setIsPlayingDescending(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
       }, (scale.notes.length * 2 + 1) * 450 + 200);
@@ -43,6 +52,7 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
       // Calculate duration: notes + octave note
       setTimeout(() => {
         setIsPlaying(false);
+        setIsPlayingDescending(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
       }, (scale.notes.length + 1) * 450 + 200);
@@ -179,12 +189,24 @@ export const BrowseScalesScreen: React.FC<BrowseScalesScreenProps> = ({ onClose,
               {/* Musical Staff Notation */}
               <div>
                 <div className="text-sm text-gray-400 mb-2">Musical Notation:</div>
-                <StaffNotation notes={selectedScale.notes} scaleName={selectedScale.name} activeNoteIndex={activeNoteIndex} />
+                <StaffNotation 
+                  notes={selectedScale.type === 'melodic-minor' && isPlayingDescending && selectedScale.notesDescending 
+                    ? selectedScale.notesDescending 
+                    : selectedScale.notes} 
+                  scaleName={selectedScale.name} 
+                  activeNoteIndex={activeNoteIndex} 
+                />
               </div>
 
               <div>
                 <div className="text-sm text-gray-400 mb-2">Piano Keyboard:</div>
-                <PianoKeyboard scaleNotes={selectedScale.notes} activeNoteIndex={activeNoteIndex} activeNote={activeNote} />
+                <PianoKeyboard 
+                  scaleNotes={selectedScale.type === 'melodic-minor' && isPlayingDescending && selectedScale.notesDescending 
+                    ? selectedScale.notesDescending 
+                    : selectedScale.notes} 
+                  activeNoteIndex={activeNoteIndex} 
+                  activeNote={activeNote} 
+                />
               </div>
 
               {/* Audio Controls */}

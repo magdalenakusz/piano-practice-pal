@@ -247,7 +247,8 @@ export function playScaleUpAndDown(
   notes: string[], 
   tempo: 'slow' | 'medium' | 'fast' = 'medium',
   onNotePlay?: (noteIndex: number, note: string) => void,
-  notesDescending?: string[]
+  notesDescending?: string[],
+  onDirectionChange?: (isDescending: boolean) => void
 ): void {
   // Add octave note at the end of ascending
   const ascending = [...notes, notes[0]];
@@ -282,10 +283,22 @@ export function playScaleUpAndDown(
   const descendingOctaves = [...ascendingOctaves].reverse().slice(1);
   const allOctaves = [...ascendingOctaves, ...descendingOctaves];
   
+  // Track when we switch from ascending to descending
+  const ascendingLength = ascending.length;
+  let directionChangeScheduled = false;
+  
   fullScale.forEach((note, index) => {
     const frequency = getNoteFrequency(note, allOctaves[index]);
     if (frequency) {
       playNote(frequency, noteDuration, startTime + (index * noteInterval));
+      
+      // Notify when we start playing descending notes
+      if (onDirectionChange && !directionChangeScheduled && index === ascendingLength) {
+        directionChangeScheduled = true;
+        setTimeout(() => {
+          onDirectionChange(true);
+        }, (index * noteInterval * 1000) + 100);
+      }
       
       // Schedule animation callback with full note including octave
       // Map the fullScale index back to the display notes array (8 notes including octave)

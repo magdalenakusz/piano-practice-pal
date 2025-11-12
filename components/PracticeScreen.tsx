@@ -74,18 +74,24 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeNoteIndex, setActiveNoteIndex] = useState(-1);
   const [activeNote, setActiveNote] = useState('');
+  const [isPlayingDescending, setIsPlayingDescending] = useState(false);
 
   const isMelodicMinor = scale.type === 'melodic-minor';
-  const displayNotes = isMelodicMinor && showDescending && scale.notesDescending
+  // During playback, switch display based on which direction is playing
+  // When not playing, use the showDescending prop from the toggle button
+  const effectiveShowDescending = isPlaying ? isPlayingDescending : showDescending;
+  
+  const displayNotes = isMelodicMinor && effectiveShowDescending && scale.notesDescending
     ? scale.notesDescending
     : scale.notes;
   
-  const equivalentNotes = equivalent && isMelodicMinor && showDescending && equivalent.notesDescending
+  const equivalentNotes = equivalent && isMelodicMinor && effectiveShowDescending && equivalent.notesDescending
     ? equivalent.notesDescending
     : equivalent?.notes;
 
     const handlePlay = (mode: 'single' | 'upAndDown') => {
     setIsPlaying(true);
+    setIsPlayingDescending(false); // Always start with ascending
     
     const noteCallback = (index: number, note: string) => {
       setActiveNoteIndex(index);
@@ -97,11 +103,18 @@ const ScaleDisplay: React.FC<ScaleDisplayProps> = ({
       const descendingNotes = isMelodicMinor && scale.notesDescending 
         ? scale.notesDescending 
         : undefined;
-      playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes);
+      
+      // Callback to switch UI when descending starts
+      const directionCallback = isMelodicMinor ? (isDesc: boolean) => {
+        setIsPlayingDescending(isDesc);
+      } : undefined;
+      
+      playScaleUpAndDown(scale.notes, 'medium', noteCallback, descendingNotes, directionCallback);
       // Calculate duration: notes + octave note, played twice (up and down), minus one for the turn
       // (notes.length + 1) * 2 - 1 = notes.length * 2 + 1
       setTimeout(() => {
         setIsPlaying(false);
+        setIsPlayingDescending(false);
         setActiveNoteIndex(-1);
         setActiveNote('');
       }, (scale.notes.length * 2 + 1) * 450 + 200);

@@ -49,11 +49,11 @@ const BASE_NOTE_FREQUENCIES: { [key: string]: number } = {
 const NOTE_ORDER = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
 // Map enharmonic notes to their base note for octave calculation
+// IMPORTANT: Only map Cb and Fb (flats that would cause premature octave++)
+// Do NOT map B# and E# because they should naturally stay in current octave
 const ENHARMONIC_BASE_MAP: { [key: string]: string } = {
-  'Cb': 'B',  // C-flat is B
-  'B#': 'C',  // B-sharp is C
-  'E#': 'F',  // E-sharp is F
-  'Fb': 'E',  // F-flat is E
+  'Cb': 'B',  // C-flat is B (prevents premature octave increment)
+  'Fb': 'E',  // F-flat is E (prevents premature octave increment)
   'C##': 'D', // C-double-sharp is D
   'F##': 'G', // F-double-sharp is G
   'G##': 'A', // G-double-sharp is A
@@ -85,28 +85,30 @@ function calculateOctavesForScale(notes: string[]): number[] {
   let currentOctave = 4;
   
   const octaves: number[] = [];
-  // For octave detection, use the ORIGINAL note letter (before enharmonic mapping)
-  // This prevents B# from being treated as C for octave boundary detection
-  let previousLetter = notes[0].charAt(0);
+  
+  // Use the ENHARMONIC BASE for octave detection
+  // This ensures Cb is treated as B and Fb as E when detecting octave boundaries
+  // while preserving the original note names for music theory correctness
+  let previousBase = getNoteBase(notes[0]);
   
   for (let i = 0; i < notes.length; i++) {
     const note = notes[i];
-    const currentLetter = note.charAt(0);
-    const currentPos = NOTE_ORDER.indexOf(currentLetter);
-    const prevPos = NOTE_ORDER.indexOf(previousLetter);
+    
+    // Get the enharmonic base for octave position comparison
+    // Example: Cb → B, Fb → E, B# → C
+    const currentBase = getNoteBase(note);
+    const currentPos = NOTE_ORDER.indexOf(currentBase);
+    const prevPos = NOTE_ORDER.indexOf(previousBase);
     
     // Increment octave when we cross from B to C (or wrap around)
-    // This happens when current position is less than previous AND
-    // it's the natural B(6) -> C(0) progression
+    // Using enharmonic base ensures Cb (treated as B) won't trigger
+    // premature octave increment
     if (i > 0 && currentPos < prevPos) {
       currentOctave++;
     }
     
-    // All notes in a scale should stay within the same octave span
-    // No additional octave adjustments needed - the note letter progression
-    // handles octave changes correctly
     octaves.push(currentOctave);
-    previousLetter = currentLetter;
+    previousBase = currentBase;
   }
   
   return octaves;

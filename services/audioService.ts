@@ -253,9 +253,9 @@ export function playScaleUpAndDown(
   // Add octave note at the end of ascending
   const ascending = [...notes, notes[0]];
   // Descending: from the octave down to (but not including) the root
-  // For melodic minor, use the provided notesDescending array
+  // For melodic minor, notesDescending is in ascending order, so add octave, reverse, and skip root
   const descending = notesDescending 
-    ? [...notesDescending].slice(1) // notesDescending already includes octave, skip the root to avoid duplicate
+    ? [...notesDescending, notesDescending[0]].reverse().slice(1)
     : [...notes, notes[0]].reverse().slice(1);
   const fullScale = [...ascending, ...descending];
   

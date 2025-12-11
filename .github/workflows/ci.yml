@@ -15,6 +15,8 @@ jobs:
   test-and-build:
     name: Test & Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     
     steps:
       - uses: actions/checkout@v4
